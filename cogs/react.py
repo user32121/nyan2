@@ -34,12 +34,20 @@ class React(interactions.Extension):
             await ctx.send("could not find message")
             return
         try:
-            emoji = emoji.split(",")
-            emoji = int(emoji[0]), int(emoji[1])
-        except (IndexError, ValueError) as e:
-            await ctx.send("invalid emoji")
-            logger.info(e)
-            return
+            sfs = emoji.split(",")
+            emoji = int(sfs[0]), int(sfs[1])
+        except (IndexError, ValueError):
+            sfs = None
+            for g in self.bot.guilds:
+                for e in await g.fetch_all_custom_emojis():
+                    if (e.name == emoji):
+                        sfs = e.id, g.id
+                        logger.info(sfs)
+            if (sfs == None):
+                await ctx.send("invalid emoji")
+                logger.info(e)
+                return
+            emoji = sfs
         emoji = await self.bot.fetch_custom_emoji(*emoji)
         if (emoji == None):
             await ctx.send("could not find emoji")
