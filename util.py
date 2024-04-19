@@ -8,7 +8,7 @@ import config
 
 
 command_args: dict[str, typing.Any] = {"scopes": config.GUILDS}
-not_implemented_args: dict[str, typing.Any] = {"description": "Not implemented", **command_args}
+not_implemented_args: dict[str, typing.Any] = {"description": "not implemented", **command_args}
 
 
 def configure_logger():

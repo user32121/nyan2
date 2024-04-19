@@ -36,7 +36,7 @@ class React(interactions.Extension):
         try:
             sfs = emoji.split(",")
             emoji = int(sfs[0]), int(sfs[1])
-        except (IndexError, ValueError):
+        except (IndexError, ValueError) as err:
             sfs = None
             for g in self.bot.guilds:
                 for e in await g.fetch_all_custom_emojis():
@@ -45,7 +45,7 @@ class React(interactions.Extension):
                         logger.info(sfs)
             if (sfs == None):
                 await ctx.send("invalid emoji")
-                logger.info(e)
+                logger.info(err)
                 return
             emoji = sfs
         emoji = await self.bot.fetch_custom_emoji(*emoji)
