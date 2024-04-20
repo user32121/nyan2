@@ -22,7 +22,7 @@ class Scan(interactions.Extension):
 
 cache_locks: dict[int, asyncio.Lock] = {}
 most_recent_cached: dict[int, int] = {}
-message_cache: dict[int, list[tuple[int, str]]] = {}
+message_cache: dict[int, list[tuple[int, int, str]]] = {}
 
 
 async def fill_cache(bot: interactions.Client, channel: interactions.TYPE_MESSAGEABLE_CHANNEL, ctx_updates: interactions.SlashContext):
@@ -49,6 +49,6 @@ async def fill_cache(bot: interactions.Client, channel: interactions.TYPE_MESSAG
         if (time.time() - last_updated >= 5):
             await ctx_updates.edit(content=f"filling cache: {len(message_cache[channel.id])} messages")
             last_updated = time.time()
-        message_cache[channel.id].append((m.author.id, m.content))
+        message_cache[channel.id].append((m.id, m.author.id, m.content))
     await ctx_updates.edit(content=f"finished filling cache: {len(message_cache[channel.id])} messages")
     cache_locks[channel.id].release()

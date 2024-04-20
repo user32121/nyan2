@@ -22,3 +22,7 @@ def configure_logger():
 
 async def not_implemented(ctx: interactions.SlashContext):
     await ctx.send("Not implemented")
+
+
+def as_choices(choices: list[str]) -> list[interactions.SlashCommandChoice]:
+    return [interactions.SlashCommandChoice(x, x) for x in choices]
