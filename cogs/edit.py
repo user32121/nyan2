@@ -1,6 +1,7 @@
 import logging
 import tempfile
 import io
+import re
 
 import interactions
 import PIL.Image
@@ -44,20 +45,24 @@ def to_file(imgs: list[PIL.Image.Image]) -> tuple[tempfile._TemporaryFileWrapper
 
 
 def add_caption(imgs: list[PIL.Image.Image], text: str, relative_font_size: float = 1) -> list[PIL.Image.Image]:
-    text = text.replace(r"\n", "\n")
-    text = text.replace(r"\\", "\\")
-    texts = text.split(",")
-    if (len(texts) < 2):
-        texts.append("")
-    texts[0] = texts[0].replace(r"\,", ",")
-    texts[1] = texts[1].replace(r"\,", ",")
+    text = text.replace(r"\\", "\0")
+    m = re.fullmatch(r"(.+?)(?<!\\)(?:,(.+))?", text)
+    if (m == None):
+        texts = [text, ""]
+    else:
+        texts = [m[1], m[2] or ""]
+    for i in range(2):
+        texts[i] = texts[i].replace(r"\,", ",")
+        texts[i] = texts[i].replace("\0", "\\")
+
     for img in imgs:
         font_size = int(img.width / 15 * relative_font_size)
         font = PIL.ImageFont.truetype("impact.ttf", font_size)
         stroke_width = int(font_size/10)
         draw = PIL.ImageDraw.Draw(img)
-        _, _, w, _ = draw.textbbox((0, 0), text, font, align="center", stroke_width=3)
+        _, _, w, _ = draw.textbbox((0, 0), texts[0], font, align="center", stroke_width=3)
         draw.text(((img.width-w)/2, 0), texts[0], fill="white", font=font, align="center", stroke_width=stroke_width, stroke_fill="black")
-        _, _, w, h = draw.textbbox((0, 0), text, font, align="center", stroke_width=3)
+        _, _, w, h = draw.textbbox((0, 0), texts[1], font, align="center", stroke_width=3)
         draw.text(((img.width-w)/2, img.height-h), texts[1], fill="white", font=font, align="center", stroke_width=stroke_width, stroke_fill="black")
+
     return imgs
