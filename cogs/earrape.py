@@ -1,12 +1,11 @@
-import logging
 import io
+import logging
+import tempfile
 import typing
 
 import interactions
-import requests
 import pydub
-import numpy as np
-import tempfile
+import requests
 
 import util
 

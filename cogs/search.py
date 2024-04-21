@@ -4,6 +4,7 @@ import re
 import interactions
 
 import util
+
 from . import scan
 
 logger = logging.getLogger(__name__)

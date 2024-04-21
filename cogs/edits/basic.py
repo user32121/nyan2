@@ -1,12 +1,12 @@
+import logging
 import re
 import typing
-import logging
 
-import PIL.Image
-import PIL.ImageFont
-import PIL.ImageDraw
-import numpy as np
 import interactions
+import numpy as np
+import PIL.Image
+import PIL.ImageDraw
+import PIL.ImageFont
 
 logger = logging.getLogger(__name__)
 

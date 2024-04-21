@@ -1,13 +1,11 @@
 import logging
 import os
-import io
-import typing
 
 import interactions
 
 import util
-from .edits import image_io
-from .edits import basic
+
+from .edits import basic, image_io
 
 logger = logging.getLogger(__name__)
 

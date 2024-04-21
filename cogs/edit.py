@@ -3,7 +3,8 @@ import logging
 import interactions
 
 import util
-from .edits import image_io, basic
+
+from .edits import basic, image_io
 
 logger = logging.getLogger(__name__)
 base_command = interactions.SlashCommand(**util.command_args, name="edit", description="various image edits")
@@ -93,7 +94,7 @@ class Edit(interactions.Extension):
         if (img == None):
             return
         colour = await basic.parse_colour(ctx, colour)
-        if(colour == None):
+        if (colour == None):
             return
         img = basic.multiply(img, colour)
         await image_io.send_file(ctx, img)

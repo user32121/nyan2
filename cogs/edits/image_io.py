@@ -1,11 +1,11 @@
-import logging
 import io
+import logging
 import tempfile
 import typing
 
-import requests
-import PIL.Image
 import interactions
+import PIL.Image
+import requests
 
 logger = logging.getLogger(__name__)
 

@@ -1,12 +1,11 @@
-import logging
 import datetime
+import logging
 import typing
 
 import interactions
 
 import secret
 import util
-
 
 util.configure_logger()
 logger = logging.getLogger(__name__)
