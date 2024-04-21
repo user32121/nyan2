@@ -64,3 +64,29 @@ async def parse_colour(ctx_update: interactions.SlashContext, s: str) -> typing.
         logger.info(e)
         await ctx_update.send("bad colour format")
         return None
+
+
+def hsv_hue(imgs: list[PIL.Image.Image]) -> list[PIL.Image.Image]:
+    for i in range(len(imgs)):
+        ar = np.array(imgs[i].convert("HSV"))
+        ar[:, :, [1, 2]] = 255
+        imgs[i] = PIL.Image.fromarray(ar, "HSV").convert("RGBA")
+    return imgs
+
+
+def hsv_saturation(imgs: list[PIL.Image.Image]) -> list[PIL.Image.Image]:
+    for i in range(len(imgs)):
+        ar = np.array(imgs[i].convert("HSV"))
+        ar[:, :, 0] = ar[:, :, 1]
+        ar[:, :, 2] = ar[:, :, 1]
+        imgs[i] = PIL.Image.fromarray(ar, "RGB")
+    return imgs
+
+
+def hsv_value(imgs: list[PIL.Image.Image]) -> list[PIL.Image.Image]:
+    for i in range(len(imgs)):
+        ar = np.array(imgs[i].convert("HSV"))
+        ar[:, :, 0] = ar[:, :, 2]
+        ar[:, :, 1] = ar[:, :, 2]
+        imgs[i] = PIL.Image.fromarray(ar, "RGB")
+    return imgs

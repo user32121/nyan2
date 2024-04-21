@@ -20,7 +20,7 @@ class Edit(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
 
-    @basic_group.subcommand(sub_cmd_name="red", sub_cmd_description="isolate the red component of the image")
+    @basic_group.subcommand(sub_cmd_name="red", sub_cmd_description="isolate the red component")
     async def red(self, ctx: interactions.SlashContext,
                   file: file_option,  # type: ignore
                   ) -> None:
@@ -31,7 +31,7 @@ class Edit(interactions.Extension):
         img = basic.multiply(img, (1, 0, 0, 1))
         await image_io.send_file(ctx, img)
 
-    @basic_group.subcommand(sub_cmd_name="green", sub_cmd_description="isolate the green component of the image")
+    @basic_group.subcommand(sub_cmd_name="green", sub_cmd_description="isolate the green component")
     async def green(self, ctx: interactions.SlashContext,
                     file: file_option,  # type: ignore
                     ) -> None:
@@ -42,7 +42,7 @@ class Edit(interactions.Extension):
         img = basic.multiply(img, (0, 1, 0, 1))
         await image_io.send_file(ctx, img)
 
-    @basic_group.subcommand(sub_cmd_name="blue", sub_cmd_description="isolate the blue component of the image")
+    @basic_group.subcommand(sub_cmd_name="blue", sub_cmd_description="isolate the blue component")
     async def blue(self, ctx: interactions.SlashContext,
                    file: file_option,  # type: ignore
                    ) -> None:
@@ -53,23 +53,38 @@ class Edit(interactions.Extension):
         img = basic.multiply(img, (0, 0, 1, 1))
         await image_io.send_file(ctx, img)
 
-    @basic_group.subcommand(sub_cmd_name="hue", sub_cmd_description="not implemented")
+    @basic_group.subcommand(sub_cmd_name="hue", sub_cmd_description="isolate the HSV hue")
     async def hue(self, ctx: interactions.SlashContext,
                   file: file_option,  # type: ignore
                   ) -> None:
-        await util.not_implemented(ctx)
+        await ctx.defer()
+        img = await image_io.from_url(ctx, file.proxy_url)
+        if (img == None):
+            return
+        img = basic.hsv_hue(img)
+        await image_io.send_file(ctx, img)
 
-    @basic_group.subcommand(sub_cmd_name="saturation", sub_cmd_description="not implemented")
+    @basic_group.subcommand(sub_cmd_name="saturation", sub_cmd_description="isolate the HSV saturation")
     async def saturation(self, ctx: interactions.SlashContext,
                          file: file_option,  # type: ignore
                          ) -> None:
-        await util.not_implemented(ctx)
+        await ctx.defer()
+        img = await image_io.from_url(ctx, file.proxy_url)
+        if (img == None):
+            return
+        img = basic.hsv_saturation(img)
+        await image_io.send_file(ctx, img)
 
-    @basic_group.subcommand(sub_cmd_name="luminosity", sub_cmd_description="not implemented")
-    async def luminosity(self, ctx: interactions.SlashContext,
+    @basic_group.subcommand(sub_cmd_name="value", sub_cmd_description="isolate the HSV value")
+    async def value(self, ctx: interactions.SlashContext,
                          file: file_option,  # type: ignore
                          ) -> None:
-        await util.not_implemented(ctx)
+        await ctx.defer()
+        img = await image_io.from_url(ctx, file.proxy_url)
+        if (img == None):
+            return
+        img = basic.hsv_value(img)
+        await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="invert", sub_cmd_description="not implemented")
     async def invert(self, ctx: interactions.SlashContext,
@@ -84,7 +99,7 @@ class Edit(interactions.Extension):
                    ) -> None:
         await util.not_implemented(ctx)
 
-    @basic_group.subcommand(sub_cmd_name="multiply", sub_cmd_description="multiply the image by a colour")
+    @basic_group.subcommand(sub_cmd_name="multiply", sub_cmd_description="multiply by a colour")
     async def multiply(self, ctx: interactions.SlashContext,
                        file: file_option,  # type: ignore
                        colour: colour_option,  # type: ignore
