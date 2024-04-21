@@ -27,8 +27,9 @@ class Earrape(interactions.Extension):
         with io.BytesIO(res.content) as f:
             try:
                 audio: pydub.AudioSegment = pydub.AudioSegment.from_file(f)
-            except IndexError:
+            except IndexError as e:
                 await ctx.send("unable to read audio file")
+                logger.info(e)
                 return
             audio = audio.apply_gain(gain)
         with typing.cast(tempfile._TemporaryFileWrapper, audio.export()) as f:

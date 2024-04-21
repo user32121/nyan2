@@ -26,9 +26,8 @@ class Image(interactions.Extension):
         await ctx.defer()
         filename = os.path.join("cogs", "images", image)
         if (caption == None):
-            await ctx.send(file=filename)
+            await ctx.send(file=filename)  # might need to sanitize this
         else:
-            imgs = image_io.from_file(open(filename, "rb"))
-            imgs = basic.add_caption(imgs, caption, font_size)
-            f, ext = image_io.to_file(imgs)
-            await ctx.send(file=interactions.File(typing.cast(io.IOBase, f.file), f"image.{ext}"))
+            img = image_io.from_file(open(filename, "rb"))
+            img = basic.add_caption(img, caption, font_size)
+            await image_io.send_file(ctx, img)

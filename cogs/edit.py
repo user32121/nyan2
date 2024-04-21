@@ -3,6 +3,7 @@ import logging
 import interactions
 
 import util
+from .edits import image_io, basic
 
 logger = logging.getLogger(__name__)
 base_command = interactions.SlashCommand(**util.command_args, name="edit", description="various image edits")
@@ -16,9 +17,17 @@ class Edit(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
 
-    @basic_group.subcommand(sub_cmd_name="red", sub_cmd_description="not implemented\nisolate the red component of the image")
-    async def red(self, ctx: interactions.SlashContext) -> None:
-        await util.not_implemented(ctx)
+    @basic_group.subcommand(sub_cmd_name="red", sub_cmd_description="isolate the red component of the image")
+    async def red(self, ctx: interactions.SlashContext,
+                  file: interactions.slash_attachment_option("the image to edit", True),  # type: ignore
+                  ) -> None:
+        await ctx.defer()
+        img = image_io.from_url(file.proxy_url)
+        if (img == None):
+            await ctx.send("unable to read image file")
+            return
+        img = basic.isolate_red(img)
+        await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="green", sub_cmd_description="not implemented")
     async def green(self, ctx: interactions.SlashContext) -> None:
