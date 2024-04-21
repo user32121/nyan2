@@ -6,7 +6,8 @@ import typing
 import interactions
 
 import util
-from . import edit
+from .edits import image_io
+from .edits import basic
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ class Image(interactions.Extension):
         if (caption == None):
             await ctx.send(file=filename)
         else:
-            imgs = edit.from_file(open(filename, "rb"))
-            imgs = edit.add_caption(imgs, caption, font_size)
-            f, ext = edit.to_file(imgs)
+            imgs = image_io.from_file(open(filename, "rb"))
+            imgs = basic.add_caption(imgs, caption, font_size)
+            f, ext = image_io.to_file(imgs)
             await ctx.send(file=interactions.File(typing.cast(io.IOBase, f.file), f"image.{ext}"))
