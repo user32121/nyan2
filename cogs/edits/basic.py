@@ -45,23 +45,15 @@ def multiply(imgs: list[PIL.Image.Image], color: tuple[float, float, float, floa
 
 async def parse_colour(ctx_update: interactions.SlashContext, s: str) -> typing.Optional[tuple[float, float, float, float]]:
     s = s.strip()
-    if (s.count(",") == 2):
-        ss = s.split(",") + ["255"]
-        base = 10
-    elif (s.count(",") == 3):
+    if (s.count(",") == 2 or s.count(",") == 3):
         ss = s.split(",")
+        if (s.count(",") == 2):
+            ss.append("255")
         base = 10
-    elif (len(s) == 6):
-        ss = [s[0:2], s[2:4], s[4:6], "FF"]
-        base = 16
-    elif (len(s) == 7 and s[0] == "#"):
-        ss = [s[1:3], s[3:5], s[5:7], "FF"]
-        base = 16
-    elif (len(s) == 8):
-        ss = [s[0:2], s[2:4], s[4:6], s[6:8]]
-        base = 16
-    elif (len(s) == 9 and s[0] == "#"):
-        ss = [s[1:3], s[3:5], s[5:7], s[7:9]]
+    elif (len(s) >= 6 and len(s) <= 9 and (len(s) % 2 == 0 or s[0] == "#")):
+        if (len(s) % 2 == 1):
+            s = s[1:]
+        ss = [s[0:2], s[2:4], s[4:6], s[6:8] if len(s) == 8 else "FF"]
         base = 16
     else:
         await ctx_update.send("unknown colour format")
