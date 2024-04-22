@@ -8,10 +8,12 @@ import PIL.Image
 import PIL.ImageDraw
 import PIL.ImageFont
 
+from . import image_io
+
 logger = logging.getLogger(__name__)
 
 
-def add_caption(imgs: list[PIL.Image.Image], text: str, relative_font_size: float = 1) -> list[PIL.Image.Image]:
+def add_caption(imgs: list[image_io.ImageFrame], text: str, relative_font_size: float = 1) -> list[image_io.ImageFrame]:
     text = text.replace(r"\\", "\0")
     m = re.fullmatch(r"(.+?)(?<!\\)(?:,(.+))?", text)
     if (m == None):
@@ -23,23 +25,23 @@ def add_caption(imgs: list[PIL.Image.Image], text: str, relative_font_size: floa
         texts[i] = texts[i].replace("\0", "\\")
 
     for img in imgs:
-        font_size = int(img.width / 15 * relative_font_size)
+        font_size = int(img.frame.width / 15 * relative_font_size)
         font = PIL.ImageFont.truetype("impact.ttf", font_size)
         stroke_width = int(font_size/10)
-        draw = PIL.ImageDraw.Draw(img)
+        draw = PIL.ImageDraw.Draw(img.frame)
         _, _, w, _ = draw.textbbox((0, 0), texts[0], font, align="center", stroke_width=3)
-        draw.text(((img.width-w)/2, 0), texts[0], fill="white", font=font, align="center", stroke_width=stroke_width, stroke_fill="black")
+        draw.text(((img.frame.width-w)/2, 0), texts[0], fill="white", font=font, align="center", stroke_width=stroke_width, stroke_fill="black")
         _, _, w, h = draw.textbbox((0, 0), texts[1], font, align="center", stroke_width=3)
-        draw.text(((img.width-w)/2, img.height-h), texts[1], fill="white", font=font, align="center", stroke_width=stroke_width, stroke_fill="black")
+        draw.text(((img.frame.width-w)/2, img.frame.height-h), texts[1], fill="white", font=font, align="center", stroke_width=stroke_width, stroke_fill="black")
 
     return imgs
 
 
-def multiply(imgs: list[PIL.Image.Image], color: tuple[float, float, float, float]) -> list[PIL.Image.Image]:
+def multiply(imgs: list[image_io.ImageFrame], color: tuple[float, float, float, float]) -> list[image_io.ImageFrame]:
     for i in range(len(imgs)):
-        ar = np.array(imgs[i].convert("RGBA"))
+        ar = np.array(imgs[i].frame.convert("RGBA"))
         ar = (ar * color).astype(ar.dtype)
-        imgs[i] = PIL.Image.fromarray(ar, "RGBA")
+        imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
     return imgs
 
 
@@ -66,27 +68,35 @@ async def parse_colour(ctx_update: interactions.SlashContext, s: str) -> typing.
         return None
 
 
-def hsv_hue(imgs: list[PIL.Image.Image]) -> list[PIL.Image.Image]:
+def hsv_hue(imgs: list[image_io.ImageFrame]) -> list[image_io.ImageFrame]:
     for i in range(len(imgs)):
-        ar = np.array(imgs[i].convert("HSV"))
+        ar = np.array(imgs[i].frame.convert("HSV"))
         ar[:, :, [1, 2]] = 255
-        imgs[i] = PIL.Image.fromarray(ar, "HSV").convert("RGBA")
+        imgs[i].frame = PIL.Image.fromarray(ar, "HSV").convert("RGBA")
     return imgs
 
 
-def hsv_saturation(imgs: list[PIL.Image.Image]) -> list[PIL.Image.Image]:
+def hsv_saturation(imgs: list[image_io.ImageFrame]) -> list[image_io.ImageFrame]:
     for i in range(len(imgs)):
-        ar = np.array(imgs[i].convert("HSV"))
+        ar = np.array(imgs[i].frame.convert("HSV"))
         ar[:, :, 0] = ar[:, :, 1]
         ar[:, :, 2] = ar[:, :, 1]
-        imgs[i] = PIL.Image.fromarray(ar, "RGB")
+        imgs[i].frame = PIL.Image.fromarray(ar, "RGB")
     return imgs
 
 
-def hsv_value(imgs: list[PIL.Image.Image]) -> list[PIL.Image.Image]:
+def hsv_value(imgs: list[image_io.ImageFrame]) -> list[image_io.ImageFrame]:
     for i in range(len(imgs)):
-        ar = np.array(imgs[i].convert("HSV"))
+        ar = np.array(imgs[i].frame.convert("HSV"))
         ar[:, :, 0] = ar[:, :, 2]
         ar[:, :, 1] = ar[:, :, 2]
-        imgs[i] = PIL.Image.fromarray(ar, "RGB")
+        imgs[i].frame = PIL.Image.fromarray(ar, "RGB")
+    return imgs
+
+
+def invert(imgs: list[image_io.ImageFrame]) -> list[image_io.ImageFrame]:
+    for i in range(len(imgs)):
+        ar = np.array(imgs[i].frame.convert("RGBA"))
+        ar[:, :, :3] = np.iinfo(ar.dtype).max - ar[:, :, :3]
+        imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
     return imgs

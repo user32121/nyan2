@@ -86,11 +86,16 @@ class Edit(interactions.Extension):
         img = basic.hsv_value(img)
         await image_io.send_file(ctx, img)
 
-    @basic_group.subcommand(sub_cmd_name="invert", sub_cmd_description="not implemented")
+    @basic_group.subcommand(sub_cmd_name="invert", sub_cmd_description="invert")
     async def invert(self, ctx: interactions.SlashContext,
                      file: file_option,  # type: ignore
                      ) -> None:
-        await util.not_implemented(ctx)
+        await ctx.defer()
+        img = await image_io.from_url(ctx, file.proxy_url)
+        if (img == None):
+            return
+        img = basic.invert(img)
+        await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="blend", sub_cmd_description="not implemented")
     async def tint(self, ctx: interactions.SlashContext,
