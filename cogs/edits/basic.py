@@ -108,3 +108,17 @@ def tint(imgs: list[image_io.ImageFrame], colour: tuple[int, int, int, int]) -> 
         ar = ((ar + colour) / 2).astype(ar.dtype)
         imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
     return imgs
+
+
+def grid(imgs: list[image_io.ImageFrame], thickness: int, colour: tuple[int, int, int, int]) -> list[image_io.ImageFrame]:
+    t = thickness
+    for i in range(len(imgs)):
+        ar = np.array(imgs[i].frame.convert("RGBA"))
+        for j in range(1, 10):
+            width, height, _ = ar.shape
+            x = width * j // 10
+            y = height * j // 10
+            ar[x-t//2:x+(t+1)//2, :] = colour
+            ar[:, y-t//2:y+(t+1)//2] = colour
+        imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
+    return imgs

@@ -130,8 +130,18 @@ class Edit(interactions.Extension):
     @basic_group.subcommand(sub_cmd_name="grid", sub_cmd_description="not implemented")
     async def grid(self, ctx: interactions.SlashContext,
                    file: file_option,  # type: ignore
+                   thickness: interactions.slash_int_option("line thickness, in pixels") = 1,  # type: ignore
+                   colour: interactions.slash_str_option("the colour to apply; either comma separated integers or a hex colour code") = "0,0,0",  # type: ignore
                    ) -> None:
-        await util.not_implemented(ctx)
+        await ctx.defer()
+        img = await image_io.from_url(ctx, file.proxy_url)
+        if (img == None):
+            return
+        colour = await basic.parse_colour(ctx, colour)
+        if (colour == None):
+            return
+        img = basic.grid(img, thickness, colour)
+        await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="text", sub_cmd_description="not implemented")
     async def text(self, ctx: interactions.SlashContext,
