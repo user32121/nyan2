@@ -37,15 +37,15 @@ def add_caption(imgs: list[image_io.ImageFrame], text: str, relative_font_size: 
     return imgs
 
 
-def multiply(imgs: list[image_io.ImageFrame], color: tuple[float, float, float, float]) -> list[image_io.ImageFrame]:
+def multiply(imgs: list[image_io.ImageFrame], color: tuple[int, int, int, int]) -> list[image_io.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
-        ar = (ar * color).astype(ar.dtype)
+        ar = (ar * color / 255).astype(ar.dtype)
         imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
     return imgs
 
 
-async def parse_colour(ctx_update: interactions.SlashContext, s: str) -> typing.Optional[tuple[float, float, float, float]]:
+async def parse_colour(ctx_update: interactions.SlashContext, s: str) -> typing.Optional[tuple[int, int, int, int]]:
     s = s.strip()
     if (s.count(",") == 2 or s.count(",") == 3):
         ss = s.split(",")
@@ -61,7 +61,7 @@ async def parse_colour(ctx_update: interactions.SlashContext, s: str) -> typing.
         await ctx_update.send("unknown colour format")
         return None
     try:
-        return typing.cast(tuple[float, float, float, float], tuple([int(x, base)/255 for x in ss]))
+        return typing.cast(tuple[int, int, int, int], tuple([int(x, base) for x in ss]))
     except ValueError as e:
         logger.info(e)
         await ctx_update.send("bad colour format")
@@ -97,6 +97,14 @@ def hsv_value(imgs: list[image_io.ImageFrame]) -> list[image_io.ImageFrame]:
 def invert(imgs: list[image_io.ImageFrame]) -> list[image_io.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
-        ar[:, :, :3] = np.iinfo(ar.dtype).max - ar[:, :, :3]
+        ar[:, :, :3] = 255 - ar[:, :, :3]
+        imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
+    return imgs
+
+
+def tint(imgs: list[image_io.ImageFrame], colour: tuple[int, int, int, int]) -> list[image_io.ImageFrame]:
+    for i in range(len(imgs)):
+        ar = np.array(imgs[i].frame.convert("RGBA"))
+        ar = ((ar + colour) / 2).astype(ar.dtype)
         imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
     return imgs

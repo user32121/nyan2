@@ -28,7 +28,7 @@ class Edit(interactions.Extension):
         img = await image_io.from_url(ctx, file.proxy_url)
         if (img == None):
             return
-        img = basic.multiply(img, (1, 0, 0, 1))
+        img = basic.multiply(img, (255, 0, 0, 255))
         await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="green", sub_cmd_description="isolate the green component")
@@ -39,7 +39,7 @@ class Edit(interactions.Extension):
         img = await image_io.from_url(ctx, file.proxy_url)
         if (img == None):
             return
-        img = basic.multiply(img, (0, 1, 0, 1))
+        img = basic.multiply(img, (0, 255, 0, 255))
         await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="blue", sub_cmd_description="isolate the blue component")
@@ -50,7 +50,7 @@ class Edit(interactions.Extension):
         img = await image_io.from_url(ctx, file.proxy_url)
         if (img == None):
             return
-        img = basic.multiply(img, (0, 0, 1, 1))
+        img = basic.multiply(img, (0, 0, 255, 255))
         await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="hue", sub_cmd_description="isolate the HSV hue")
@@ -97,12 +97,20 @@ class Edit(interactions.Extension):
         img = basic.invert(img)
         await image_io.send_file(ctx, img)
 
-    @basic_group.subcommand(sub_cmd_name="blend", sub_cmd_description="not implemented")
+    @basic_group.subcommand(sub_cmd_name="tint", sub_cmd_description="average with a colour")
     async def tint(self, ctx: interactions.SlashContext,
                    file: file_option,  # type: ignore
                    colour: colour_option,  # type: ignore
                    ) -> None:
-        await util.not_implemented(ctx)
+        await ctx.defer()
+        img = await image_io.from_url(ctx, file.proxy_url)
+        if (img == None):
+            return
+        colour = await basic.parse_colour(ctx, colour)
+        if (colour == None):
+            return
+        img = basic.tint(img, colour)
+        await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="multiply", sub_cmd_description="multiply by a colour")
     async def multiply(self, ctx: interactions.SlashContext,
