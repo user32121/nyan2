@@ -18,7 +18,7 @@ class Image(interactions.Extension):
     async def image(self, ctx: interactions.SlashContext,
                     image: interactions.slash_str_option("the image file", True,  # type: ignore
                                                          choices=util.as_choices(os.listdir(os.path.join("cogs", "images")))),
-                    caption: interactions.slash_str_option("text to put on the image, escaped with '\\' as necessary") = None,  # type: ignore
+                    caption: interactions.slash_str_option(r"text to put on the image, separated by a ','. Escape with '\' to avoid splitting") = None,  # type: ignore
                     font_size: interactions.slash_float_option("relative size of caption") = 1,  # type: ignore
                     ) -> None:
         await ctx.defer()

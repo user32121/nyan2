@@ -146,8 +146,14 @@ class Edit(interactions.Extension):
     @basic_group.subcommand(sub_cmd_name="text", sub_cmd_description="not implemented")
     async def text(self, ctx: interactions.SlashContext,
                    file: file_option,  # type: ignore
+                   caption: interactions.slash_str_option(r"text to put on the image, separated by a ','. Escape with '\' to avoid splitting", True),  # type: ignore
                    ) -> None:
-        await util.not_implemented(ctx)
+        await ctx.defer()
+        img = await image_io.from_url(ctx, file.proxy_url)
+        if (img == None):
+            return
+        img = basic.add_caption(img, caption)
+        await image_io.send_file(ctx, img)
 
     @blur_group.subcommand(sub_cmd_name="blur", sub_cmd_description="not implemented")
     async def blur(self, ctx: interactions.SlashContext,
