@@ -21,7 +21,7 @@ def from_file(file: io.IOBase) -> list[ImageFrame]:
     imgs: list[ImageFrame] = []
     for i in range(img.n_frames):
         img.seek(i)
-        imgs.append(ImageFrame(img.convert(), img.info["duration"]))
+        imgs.append(ImageFrame(img.convert(), img.info.get("duration", 0)))
     return imgs
 
 
