@@ -8,7 +8,6 @@ import util
 logger = logging.getLogger(__name__)
 
 
-# TODO send only one emoji
 class Emoji(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
