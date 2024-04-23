@@ -15,6 +15,5 @@ class Say(interactions.Extension):
     async def say(self, ctx: interactions.SlashContext,
                   text: interactions.slash_str_option("text to say", required=True),  # type: ignore
                   ) -> None:
-        if (await util.preprocess(ctx)):
-            return
+        await util.preprocess(ctx)
         await ctx.send(text)

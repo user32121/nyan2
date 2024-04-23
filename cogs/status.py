@@ -25,8 +25,7 @@ class Status(interactions.Extension):
                      activity_type: interactions.slash_str_option(description="e.g. playing, streaming", required=True,  # type: ignore
                                                                   choices=[interactions.SlashCommandChoice(k, str(int(v))) for k, v in allowed_bot_activities.items()]) = None,
                      ) -> None:
-        if (await util.preprocess(ctx)):
-            return
+        await util.preprocess(ctx)
         self.bot: interactions.Client
         activity: str
         activity_type: str

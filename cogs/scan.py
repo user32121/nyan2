@@ -16,8 +16,7 @@ class Scan(interactions.Extension):
     @interactions.slash_command(** util.command_args, name="scan", description="preload all messages from a channel for faster searching")
     async def scan(self, ctx: interactions.SlashContext,
                    ) -> None:
-        if (await util.preprocess(ctx)):
-            return
+        await util.preprocess(ctx)
         await fill_cache(ctx.bot, ctx.channel, ctx)
         await ctx.send("finished scan")
 

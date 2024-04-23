@@ -22,8 +22,7 @@ class Search(interactions.Extension):
                                                              choices=util.as_choices(["instances", "messages"])) = "instances",
                      reply: interactions.slash_bool_option("whether to reply to the first match") = False,  # type: ignore
                      ) -> None:
-        if (await util.preprocess(ctx)):
-            return
+        await util.preprocess(ctx)
         await scan.fill_cache(ctx.bot, ctx.channel, ctx)
         if (regex):
             def matches(s: str) -> int:

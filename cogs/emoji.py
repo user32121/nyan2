@@ -1,5 +1,5 @@
 import logging
-import time
+import typing
 
 import interactions
 
@@ -13,12 +13,12 @@ class Emoji(interactions.Extension):
         logger.info("init")
 
     @interactions.slash_command(** util.command_args, name="emoji", description="send emojis")
+    # @interactions.slash_option("guild", "the id of the guild or \"all\"; defaults to the current guild", interactions.OptionType.STRING)
     async def emoji(self, ctx: interactions.SlashContext,
-                    guild: interactions.slash_str_option("the id of the guild or \"all\"; defaults to the current guild") = None,  # type: ignore
+                    guild: typing.Annotated[typing.Optional[interactions.Guild], interactions.GuildConverter, interactions.slash_str_option("test")] = None,
                     emoji: interactions.slash_str_option("emoji to send; defaults to \"all\"", autocomplete=True) = "all",  # type: ignore
                     ) -> None:
-        if (await util.preprocess(ctx)):
-            return
+        await util.preprocess(ctx)
         if (guild == "all"):
             guilds = ctx.bot.guilds
         elif (guild == None):
@@ -33,7 +33,7 @@ class Emoji(interactions.Extension):
             guilds = [guild]
         if (emoji != "all"):
             emo = await util.get_emoji(ctx, emoji)
-            if(emo == None):
+            if (emo == None):
                 return
             await ctx.send(str(emo))
             return

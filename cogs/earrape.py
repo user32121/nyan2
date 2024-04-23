@@ -21,8 +21,7 @@ class Earrape(interactions.Extension):
                       file: interactions.slash_attachment_option("the file to modify", True),  # type: ignore
                       gain: interactions.slash_int_option("the amount to increase by") = 10,  # type: ignore
                       ) -> None:
-        if (await util.preprocess(ctx)):
-            return
+        await util.preprocess(ctx)
         res = requests.get(file.proxy_url)
         with io.BytesIO(res.content) as f:
             try:

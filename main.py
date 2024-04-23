@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 bot = interactions.Client(
     intents=interactions.Intents.DEFAULT | interactions.Intents.MESSAGE_CONTENT,
+    send_command_tracebacks=False,
 )
 
 
@@ -27,6 +28,10 @@ async def on_command_error(event: interactions.events.CommandError):
     err = event.error
     if isinstance(err, interactions.errors.Forbidden):
         await ctx.send("bot is missing permissions")
+    if isinstance(err, interactions.errors.BadArgument):
+        await ctx.send(str(err))
+    if isinstance(err, util.PreprocessError):
+        await ctx.send(str(err))
 
 
 @interactions.listen()

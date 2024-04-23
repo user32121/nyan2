@@ -17,8 +17,7 @@ class React(interactions.Extension):
                     message: interactions.slash_str_option("message id to react to", True),  # type: ignore
                     emoji: interactions.slash_str_option("emoji to react with", True, autocomplete=True),  # type: ignore
                     ) -> None:
-        if (await util.preprocess(ctx)):
-            return
+        await util.preprocess(ctx)
         self.bot: interactions.Client
 
         msg = await util.get_message(ctx, message)
