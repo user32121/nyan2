@@ -1,4 +1,5 @@
 import logging
+import random
 import time
 import typing
 
@@ -24,6 +25,14 @@ def configure_logger():
 
 async def not_implemented(ctx: interactions.SlashContext):
     await ctx.send("Not implemented")
+
+
+async def preprocess(ctx: interactions.SlashContext) -> bool:
+    await ctx.defer()
+    b = random.random() < 0.01
+    if (b):
+        await ctx.send("fuck off")
+    return b
 
 
 def as_choices(choices: list[str]) -> list[interactions.SlashCommandChoice]:

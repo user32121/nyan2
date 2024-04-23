@@ -21,7 +21,8 @@ class Image(interactions.Extension):
                     caption: interactions.slash_str_option(r"text to put on the image, separated by a ','. Escape with '\' to avoid splitting") = None,  # type: ignore
                     font_size: interactions.slash_float_option("relative size of caption") = 1,  # type: ignore
                     ) -> None:
-        await ctx.defer()
+        if (await util.preprocess(ctx)):
+            return
         filename = os.path.join("cogs", "images", image)
         if (caption == None):
             await ctx.send(file=filename)  # might need to sanitize this

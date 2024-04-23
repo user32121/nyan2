@@ -24,7 +24,8 @@ class Edit(interactions.Extension):
     async def red(self, ctx: interactions.SlashContext,
                   file: file_option,  # type: ignore
                   ) -> None:
-        await ctx.defer()
+        if (await util.preprocess(ctx)):
+            return
         img = await image_io.from_url(ctx, file.proxy_url)
         if (img == None):
             return
@@ -35,7 +36,8 @@ class Edit(interactions.Extension):
     async def green(self, ctx: interactions.SlashContext,
                     file: file_option,  # type: ignore
                     ) -> None:
-        await ctx.defer()
+        if (await util.preprocess(ctx)):
+            return
         img = await image_io.from_url(ctx, file.proxy_url)
         if (img == None):
             return
@@ -46,7 +48,8 @@ class Edit(interactions.Extension):
     async def blue(self, ctx: interactions.SlashContext,
                    file: file_option,  # type: ignore
                    ) -> None:
-        await ctx.defer()
+        if (await util.preprocess(ctx)):
+            return
         img = await image_io.from_url(ctx, file.proxy_url)
         if (img == None):
             return
@@ -57,7 +60,8 @@ class Edit(interactions.Extension):
     async def hue(self, ctx: interactions.SlashContext,
                   file: file_option,  # type: ignore
                   ) -> None:
-        await ctx.defer()
+        if (await util.preprocess(ctx)):
+            return
         img = await image_io.from_url(ctx, file.proxy_url)
         if (img == None):
             return
@@ -68,7 +72,8 @@ class Edit(interactions.Extension):
     async def saturation(self, ctx: interactions.SlashContext,
                          file: file_option,  # type: ignore
                          ) -> None:
-        await ctx.defer()
+        if (await util.preprocess(ctx)):
+            return
         img = await image_io.from_url(ctx, file.proxy_url)
         if (img == None):
             return
@@ -77,9 +82,10 @@ class Edit(interactions.Extension):
 
     @basic_group.subcommand(sub_cmd_name="value", sub_cmd_description="isolate the HSV value")
     async def value(self, ctx: interactions.SlashContext,
-                         file: file_option,  # type: ignore
-                         ) -> None:
-        await ctx.defer()
+                    file: file_option,  # type: ignore
+                    ) -> None:
+        if (await util.preprocess(ctx)):
+            return
         img = await image_io.from_url(ctx, file.proxy_url)
         if (img == None):
             return
@@ -90,7 +96,8 @@ class Edit(interactions.Extension):
     async def invert(self, ctx: interactions.SlashContext,
                      file: file_option,  # type: ignore
                      ) -> None:
-        await ctx.defer()
+        if (await util.preprocess(ctx)):
+            return
         img = await image_io.from_url(ctx, file.proxy_url)
         if (img == None):
             return
@@ -102,7 +109,8 @@ class Edit(interactions.Extension):
                    file: file_option,  # type: ignore
                    colour: colour_option,  # type: ignore
                    ) -> None:
-        await ctx.defer()
+        if (await util.preprocess(ctx)):
+            return
         img = await image_io.from_url(ctx, file.proxy_url)
         if (img == None):
             return
@@ -117,7 +125,8 @@ class Edit(interactions.Extension):
                        file: file_option,  # type: ignore
                        colour: colour_option,  # type: ignore
                        ) -> None:
-        await ctx.defer()
+        if (await util.preprocess(ctx)):
+            return
         img = await image_io.from_url(ctx, file.proxy_url)
         if (img == None):
             return
@@ -133,7 +142,8 @@ class Edit(interactions.Extension):
                    thickness: interactions.slash_int_option("line thickness, in pixels") = 1,  # type: ignore
                    colour: interactions.slash_str_option("the colour to apply; either comma separated integers or a hex colour code") = "0,0,0",  # type: ignore
                    ) -> None:
-        await ctx.defer()
+        if (await util.preprocess(ctx)):
+            return
         img = await image_io.from_url(ctx, file.proxy_url)
         if (img == None):
             return
@@ -148,7 +158,8 @@ class Edit(interactions.Extension):
                    file: file_option,  # type: ignore
                    caption: interactions.slash_str_option(r"text to put on the image, separated by a ','. Escape with '\' to avoid splitting", True),  # type: ignore
                    ) -> None:
-        await ctx.defer()
+        if (await util.preprocess(ctx)):
+            return
         img = await image_io.from_url(ctx, file.proxy_url)
         if (img == None):
             return

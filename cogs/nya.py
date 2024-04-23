@@ -13,4 +13,6 @@ class Nya(interactions.Extension):
 
     @interactions.slash_command(** util.command_args, name="nya")
     async def nya(self, ctx: interactions.SlashContext) -> None:
+        if (await util.preprocess(ctx)):
+            return
         await ctx.send("nya!")

@@ -17,6 +17,8 @@ class Emoji(interactions.Extension):
                     guild: interactions.slash_str_option("the id of the guild or \"all\"; defaults to the current guild") = None,  # type: ignore
                     emoji: interactions.slash_str_option("emoji to send; defaults to \"all\"", autocomplete=True) = "all",  # type: ignore
                     ) -> None:
+        if (await util.preprocess(ctx)):
+            return
         if (guild == "all"):
             guilds = ctx.bot.guilds
         elif (guild == None):

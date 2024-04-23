@@ -13,4 +13,6 @@ class No(interactions.Extension):
 
     @interactions.slash_command(** util.command_args, name="no", description="no")
     async def no(self, ctx: interactions.SlashContext) -> None:
+        if (await util.preprocess(ctx)):
+            return
         await ctx.send("no\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ")
