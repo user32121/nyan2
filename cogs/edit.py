@@ -153,7 +153,7 @@ class Edit(interactions.Extension):
         img = basic.grid(img, thickness, colour)
         await image_io.send_file(ctx, img)
 
-    @basic_group.subcommand(sub_cmd_name="text", sub_cmd_description="not implemented")
+    @basic_group.subcommand(sub_cmd_name="text", sub_cmd_description="add text")
     async def text(self, ctx: interactions.SlashContext,
                    file: file_option,  # type: ignore
                    caption: interactions.slash_str_option(r"text to put on the image, separated by a ','. Escape with '\' to avoid splitting", True),  # type: ignore
