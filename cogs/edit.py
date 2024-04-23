@@ -127,7 +127,7 @@ class Edit(interactions.Extension):
         img = basic.multiply(img, colour)
         await image_io.send_file(ctx, img)
 
-    @basic_group.subcommand(sub_cmd_name="grid", sub_cmd_description="not implemented")
+    @basic_group.subcommand(sub_cmd_name="grid", sub_cmd_description="display a grid for easier finding of coordinates")
     async def grid(self, ctx: interactions.SlashContext,
                    file: file_option,  # type: ignore
                    thickness: interactions.slash_int_option("line thickness, in pixels") = 1,  # type: ignore
