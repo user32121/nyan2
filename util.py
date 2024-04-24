@@ -26,6 +26,7 @@ def configure_logger():
 async def not_implemented(ctx: interactions.SlashContext):
     await ctx.send("Not implemented")
 
+
 class PreprocessError(Exception):
     pass
 

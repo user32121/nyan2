@@ -186,6 +186,12 @@ class Edit(interactions.Extension):
                       ) -> None:
         await util.not_implemented(ctx)
 
+    @animated_group.subcommand(sub_cmd_name="caramelldansen", sub_cmd_description="not implemented")
+    async def caramelldansen(self, ctx: interactions.SlashContext,
+                             file: file_option,
+                             ) -> None:
+        await util.not_implemented(ctx)
+
     @animated_group.subcommand(sub_cmd_name="spin", sub_cmd_description="not implemented")
     async def spin(self, ctx: interactions.SlashContext,
                    file: file_option,
