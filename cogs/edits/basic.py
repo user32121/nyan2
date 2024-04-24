@@ -2,6 +2,7 @@ import logging
 import re
 import typing
 
+import PIL.ImageFilter
 import interactions
 import numpy as np
 import PIL.Image
@@ -120,4 +121,10 @@ def grid(imgs: list[image_io.ImageFrame], thickness: int, colour: tuple[int, int
             ar[x-t//2:x+(t+1)//2, :] = colour
             ar[:, y-t//2:y+(t+1)//2] = colour
         imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
+    return imgs
+
+
+def blur(imgs: list[image_io.ImageFrame], radius: float) -> list[image_io.ImageFrame]:
+    for i in range(len(imgs)):
+        imgs[i].frame = imgs[i].frame.filter(PIL.ImageFilter.GaussianBlur(radius))
     return imgs

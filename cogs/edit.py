@@ -125,11 +125,15 @@ class Edit(interactions.Extension):
         img = basic.add_caption(img, caption)
         await image_io.send_file(ctx, img)
 
-    @blur_group.subcommand(sub_cmd_name="blur", sub_cmd_description="not implemented")
+    @blur_group.subcommand(sub_cmd_name="blur", sub_cmd_description="apply a gaussian blur")
     async def blur(self, ctx: interactions.SlashContext,
                    file: file_option,
+                   radius: typing.Annotated[float, interactions.slash_float_option("radius")] = 5,
                    ) -> None:
-        await util.not_implemented(ctx)
+        await util.preprocess(ctx)
+        img = await image_io.from_url(ctx, file.proxy_url)
+        img = basic.blur(img, radius)
+        await image_io.send_file(ctx, img)
 
     @blur_group.subcommand(sub_cmd_name="motionblur", sub_cmd_description="not implemented")
     async def motionblur(self, ctx: interactions.SlashContext,
