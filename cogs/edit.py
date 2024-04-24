@@ -5,7 +5,7 @@ import interactions
 
 import util
 
-from .edits import basic, image_io
+from .edits import basic, blur, image_io
 
 logger = logging.getLogger(__name__)
 base_command = interactions.SlashCommand(**util.command_args, name="edit", description="various image edits")
@@ -132,7 +132,7 @@ class Edit(interactions.Extension):
                    ) -> None:
         await util.preprocess(ctx)
         img = await image_io.from_url(ctx, file.proxy_url)
-        img = basic.blur(img, radius)
+        img = blur.gaussianblur(img, radius)
         await image_io.send_file(ctx, img)
 
     @blur_group.subcommand(sub_cmd_name="motionblur", sub_cmd_description="apply a motion blur")
@@ -143,7 +143,7 @@ class Edit(interactions.Extension):
                          ) -> None:
         await util.preprocess(ctx)
         img = await image_io.from_url(ctx, file.proxy_url)
-        img = basic.motionblur(img, length, angle)
+        img = blur.motionblur(img, length, angle)
         await image_io.send_file(ctx, img)
 
     @blur_group.subcommand(sub_cmd_name="zoomblur", sub_cmd_description="apply a zoom blur")
@@ -154,7 +154,7 @@ class Edit(interactions.Extension):
                        ) -> None:
         await util.preprocess(ctx)
         img = await image_io.from_url(ctx, file.proxy_url)
-        img = basic.zoomblur(img, zoom, interpolation)
+        img = blur.zoomblur(img, zoom, interpolation)
         await image_io.send_file(ctx, img)
 
     @blur_group.subcommand(sub_cmd_name="circularblur", sub_cmd_description="not implemented")
