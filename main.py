@@ -31,7 +31,7 @@ async def on_command_error(event: interactions.events.CommandError):
     elif isinstance(err, interactions.errors.BadArgument):
         await ctx.send(f"error: {err}")
     elif isinstance(err, util.PreprocessError):
-        await ctx.send(f"error: {err}")
+        await ctx.send(str(err))
     else:
         await ctx.send(f"an unhandled error has occurred: {err}")
 
