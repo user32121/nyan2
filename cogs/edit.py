@@ -150,18 +150,23 @@ class Edit(interactions.Extension):
     async def zoomblur(self, ctx: interactions.SlashContext,
                        file: file_option,
                        zoom: typing.Annotated[float, interactions.slash_float_option("zoom multiplier")] = 1.1,
-                       interpolation: typing.Annotated[int, interactions.slash_int_option("number of points to interpolate; more means higher quality, but slower", min_value=1)] = 10,
+                       interpolation: typing.Annotated[int, interactions.slash_int_option("number of interpolated values; more means higher quality, but slower", min_value=1)] = 30,
                        ) -> None:
         await util.preprocess(ctx)
         img = await image_io.from_url(ctx, file.proxy_url)
         img = blur.zoomblur(img, zoom, interpolation)
         await image_io.send_file(ctx, img)
 
-    @blur_group.subcommand(sub_cmd_name="circularblur", sub_cmd_description="not implemented")
+    @blur_group.subcommand(sub_cmd_name="circularblur", sub_cmd_description="apply a circular blur")
     async def circularblur(self, ctx: interactions.SlashContext,
                            file: file_option,
+                           angle: typing.Annotated[float, interactions.slash_float_option("in degrees")] = 15,
+                           interpolation: typing.Annotated[int, interactions.slash_int_option("number of interpolated values; more means higher quality, but slower", min_value=1)] = 30,
                            ) -> None:
-        await util.not_implemented(ctx)
+        await util.preprocess(ctx)
+        img = await image_io.from_url(ctx, file.proxy_url)
+        img = blur.circularblur(img, angle, interpolation)
+        await image_io.send_file(ctx, img)
 
     @animated_group.subcommand(sub_cmd_name="boom", sub_cmd_description="not implemented")
     async def boom(self, ctx: interactions.SlashContext,

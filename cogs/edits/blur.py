@@ -38,3 +38,14 @@ def zoomblur(imgs: list[image_io.ImageFrame], zoom: float, interpolation: int) -
         ar = np.mean(ars, axis=0).astype(ars[0].dtype)
         imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
     return imgs
+
+
+def circularblur(imgs: list[image_io.ImageFrame], angle: float, interpolation: int) -> list[image_io.ImageFrame]:
+    for i in range(len(imgs)):
+        ars = []
+        for a in np.linspace(-angle/2, angle/2, interpolation):
+            img = imgs[i].frame.rotate(a)
+            ars.append(np.array(img.convert("RGBA")))
+        ar = np.mean(ars, axis=0).astype(ars[0].dtype)
+        imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
+    return imgs
