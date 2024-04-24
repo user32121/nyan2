@@ -144,3 +144,15 @@ def motionblur(imgs: list[image_io.ImageFrame], length: int, angle: float) -> li
             ar[:, :, j] = scipy.signal.convolve2d(ar[:, :, j], kernel, "same")
         imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
     return imgs
+
+
+def zoomblur(imgs: list[image_io.ImageFrame], zoom: float, interpolation: int) -> list[image_io.ImageFrame]:
+    for i in range(len(imgs)):
+        ars = []
+        for z in np.linspace(1, zoom, interpolation):
+            img = imgs[i].frame.resize((int(imgs[i].frame.width*z), int(imgs[i].frame.height*z)))
+            img = img.crop(((img.width-imgs[i].frame.width)//2, (img.height-imgs[i].frame.height)//2, (img.width+imgs[i].frame.width)//2, (img.height+imgs[i].frame.height)//2))
+            ars.append(np.array(img.convert("RGBA")))
+        ar = np.mean(ars, axis=0).astype(ars[0].dtype)
+        imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
+    return imgs
