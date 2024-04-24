@@ -13,10 +13,9 @@ class Emoji(interactions.Extension):
         logger.info("init")
 
     @interactions.slash_command(** util.command_args, name="emoji", description="send emojis")
-    # @interactions.slash_option("guild", "the id of the guild or \"all\"; defaults to the current guild", interactions.OptionType.STRING)
     async def emoji(self, ctx: interactions.SlashContext,
-                    guild: typing.Annotated[typing.Optional[interactions.Guild], interactions.GuildConverter, interactions.slash_str_option("test")] = None,
-                    emoji: interactions.slash_str_option("emoji to send; defaults to \"all\"", autocomplete=True) = "all",  # type: ignore
+                    guild: typing.Annotated[typing.Optional[str], interactions.slash_str_option("the guild or \"all\"; defaults to the current guild")] = None,
+                    emoji: typing.Annotated[str, interactions.slash_str_option("emoji to send; defaults to \"all\"", autocomplete=True)] = "all",
                     ) -> None:
         await util.preprocess(ctx)
         if (guild == "all"):
@@ -27,15 +26,10 @@ class Emoji(interactions.Extension):
                 return
             guilds = [ctx.guild]
         else:
-            guild = await util.get_guild(ctx, guild)
-            if (guild == None):
-                return
-            guilds = [guild]
+            guilds = [await interactions.GuildConverter().convert(ctx, guild)]
         if (emoji != "all"):
-            emo = await util.get_emoji(ctx, emoji)
-            if (emo == None):
-                return
-            await ctx.send(str(emo))
+            e = await util.get_emoji(ctx, emoji)
+            await ctx.send(str(e))
             return
 
         msg = ""

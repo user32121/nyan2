@@ -39,17 +39,16 @@ def to_file(imgs: list[ImageFrame]) -> tuple[tempfile._TemporaryFileWrapper, str
     return (f, ext)
 
 
-async def from_url(ctx_update: interactions.SlashContext, url: str) -> typing.Optional[list[ImageFrame]]:
+async def from_url(ctx_update: interactions.SlashContext, url: str) -> list[ImageFrame]:
     res = requests.get(url)
     with io.BytesIO(res.content) as f:
         try:
             return from_file(f)
         except PIL.UnidentifiedImageError as e:
-            await ctx_update.send("unable to read image file")
             logger.info(e)
-            return None
+            raise interactions.errors.BadArgument(f"unable to read {url} as image file")
 
 
-async def send_file(ctx_update: interactions.SlashContext, img: list[ImageFrame]) -> None:
+async def send_file(ctx_update: interactions.SlashContext, img: list[ImageFrame]):
     f, ext = to_file(img)
     await ctx_update.send(file=interactions.File(typing.cast(io.IOBase, f.file), f"file.{ext}"))

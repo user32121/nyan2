@@ -26,7 +26,6 @@ def configure_logger():
 async def not_implemented(ctx: interactions.SlashContext):
     await ctx.send("Not implemented")
 
-
 class PreprocessError(Exception):
     pass
 
@@ -39,32 +38,6 @@ async def preprocess(ctx: interactions.SlashContext) -> None:
 
 def as_choices(choices: list[str]) -> list[interactions.SlashCommandChoice]:
     return [interactions.SlashCommandChoice(x, x) for x in choices]
-
-
-async def get_guild(ctx: interactions.SlashContext, id: str) -> typing.Optional[interactions.Guild]:
-    try:
-        gid = int(id)
-    except ValueError as e:
-        await ctx.send("invalid guild")
-        logger.info(e)
-        return None
-    guild = await ctx.bot.fetch_guild(gid)
-    if (guild == None):
-        await ctx.send("could not find guild")
-    return guild
-
-
-async def get_message(ctx: interactions.SlashContext, id: str) -> typing.Optional[interactions.Message]:
-    try:
-        mid = int(id)
-    except ValueError as e:
-        await ctx.send("invalid message id")
-        logger.info(e)
-        return None
-    msg = await ctx.channel.fetch_message(mid)
-    if (msg == None):
-        await ctx.send("could not find message")
-    return msg
 
 
 async def get_emojis(ctx: interactions.AutocompleteContext) -> None:
@@ -82,7 +55,7 @@ async def get_emojis(ctx: interactions.AutocompleteContext) -> None:
     await ctx.send(ret)
 
 
-async def get_emoji(ctx: interactions.SlashContext, ids: str) -> typing.Optional[interactions.CustomEmoji]:
+async def get_emoji(ctx: interactions.SlashContext, ids: str) -> interactions.CustomEmoji:
     try:
         eid, gid = ids.split(",")
         eid = int(eid)
@@ -95,10 +68,8 @@ async def get_emoji(ctx: interactions.SlashContext, ids: str) -> typing.Optional
                     eid = e.id
                     gid = g.id
         if (eid == None):
-            await ctx.send("invalid emoji")
-            logger.info(err)
-            return None
+            raise interactions.errors.BadArgument(f"invalid emoji: {ids}")
     emoji = await ctx.bot.fetch_custom_emoji(eid, gid)
     if (emoji == None):
-        await ctx.send("could not find emoji")
+        raise interactions.errors.BadArgument(f"could not find emoji {ids}")
     return emoji

@@ -18,8 +18,8 @@ class Earrape(interactions.Extension):
 
     @interactions.slash_command(** util.command_args, name="earrape")
     async def earrape(self, ctx: interactions.SlashContext,
-                      file: interactions.slash_attachment_option("the file to modify", True),  # type: ignore
-                      gain: interactions.slash_int_option("the amount to increase by") = 10,  # type: ignore
+                      file: typing.Annotated[interactions.Attachment, interactions.slash_attachment_option("the file to modify", True)],
+                      gain: typing.Annotated[int, interactions.slash_int_option("the amount to increase by")] = 10,
                       ) -> None:
         await util.preprocess(ctx)
         res = requests.get(file.proxy_url)

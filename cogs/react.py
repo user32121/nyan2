@@ -1,5 +1,6 @@
 import logging
 import time
+import typing
 
 import interactions
 
@@ -14,20 +15,15 @@ class React(interactions.Extension):
 
     @ interactions.slash_command(** util.command_args, name="react", description="react to a message with an emoji")
     async def react(self, ctx: interactions.SlashContext,
-                    message: interactions.slash_str_option("message id to react to", True),  # type: ignore
-                    emoji: interactions.slash_str_option("emoji to react with", True, autocomplete=True),  # type: ignore
+                    message: typing.Annotated[interactions.Message, interactions.MessageConverter, interactions.slash_str_option("message id to react to", True)],
+                    emoji: typing.Annotated[str, interactions.slash_str_option("emoji to react with", True, autocomplete=True)],
                     ) -> None:
         await util.preprocess(ctx)
         self.bot: interactions.Client
 
-        msg = await util.get_message(ctx, message)
-        if (msg == None):
-            return
-        emo = await util.get_emoji(ctx, emoji)
-        if (emo == None):
-            return
+        e = await util.get_emoji(ctx, emoji)
 
-        await msg.add_reaction(emo)
+        await message.add_reaction(e)
         await ctx.send("reacted", ephemeral=True)
 
     @ react.autocomplete("emoji")

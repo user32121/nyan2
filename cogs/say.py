@@ -1,4 +1,5 @@
 import logging
+import typing
 
 import interactions
 
@@ -13,7 +14,7 @@ class Say(interactions.Extension):
 
     @interactions.slash_command(** util.command_args, name="say", description="say a message")
     async def say(self, ctx: interactions.SlashContext,
-                  text: interactions.slash_str_option("text to say", required=True),  # type: ignore
+                  text: typing.Annotated[str, interactions.slash_str_option("text to say", required=True)],
                   ) -> None:
         await util.preprocess(ctx)
         await ctx.send(text)

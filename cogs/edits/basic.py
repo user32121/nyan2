@@ -45,27 +45,26 @@ def multiply(imgs: list[image_io.ImageFrame], color: tuple[int, int, int, int]) 
     return imgs
 
 
-async def parse_colour(ctx_update: interactions.SlashContext, s: str) -> typing.Optional[tuple[int, int, int, int]]:
-    s = s.strip()
-    if (s.count(",") == 2 or s.count(",") == 3):
-        ss = s.split(",")
-        if (s.count(",") == 2):
-            ss.append("255")
-        base = 10
-    elif (len(s) >= 6 and len(s) <= 9 and (len(s) % 2 == 0 or s[0] == "#")):
-        if (len(s) % 2 == 1):
-            s = s[1:]
-        ss = [s[0:2], s[2:4], s[4:6], s[6:8] if len(s) == 8 else "FF"]
-        base = 16
-    else:
-        await ctx_update.send("unknown colour format")
-        return None
-    try:
-        return typing.cast(tuple[int, int, int, int], tuple([int(x, base) for x in ss]))
-    except ValueError as e:
-        logger.info(e)
-        await ctx_update.send("bad colour format")
-        return None
+class ColourConverter(interactions.Converter):
+    async def convert(self, ctx: interactions.SlashContext, arg: str) -> tuple[int, int, int, int]:
+        arg = arg.strip()
+        if (arg.count(",") == 2 or arg.count(",") == 3):
+            ss = arg.split(",")
+            if (arg.count(",") == 2):
+                ss.append("255")
+            base = 10
+        elif (len(arg) >= 6 and len(arg) <= 9 and (len(arg) % 2 == 0 or arg[0] == "#")):
+            if (len(arg) % 2 == 1):
+                arg = arg[1:]
+            ss = [arg[0:2], arg[2:4], arg[4:6], arg[6:8] if len(arg) == 8 else "FF"]
+            base = 16
+        else:
+            raise interactions.errors.BadArgument("unknown colour format")
+        try:
+            return typing.cast(tuple[int, int, int, int], tuple([int(x, base) for x in ss]))
+        except ValueError as e:
+            logger.info(e)
+            raise interactions.errors.BadArgument("bad colour format")
 
 
 def hsv_hue(imgs: list[image_io.ImageFrame]) -> list[image_io.ImageFrame]:

@@ -1,5 +1,6 @@
 import logging
 import os
+import typing
 
 import interactions
 
@@ -16,15 +17,14 @@ class Image(interactions.Extension):
 
     @interactions.slash_command(** util.command_args, name="image", description="send an image")
     async def image(self, ctx: interactions.SlashContext,
-                    image: interactions.slash_str_option("the image file", True,  # type: ignore
-                                                         choices=util.as_choices(os.listdir(os.path.join("cogs", "images")))),
-                    caption: interactions.slash_str_option(r"text to put on the image, separated by a ','. Escape with '\' to avoid splitting") = None,  # type: ignore
-                    font_size: interactions.slash_float_option("relative size of caption") = 1,  # type: ignore
+                    image: typing.Annotated[str, interactions.slash_str_option("the image file", True, choices=util.as_choices(os.listdir(os.path.join("cogs", "images"))))],
+                    caption: typing.Annotated[typing.Optional[str], interactions.slash_str_option(r"text to put on the image, separated by a ','. Escape with '\' to avoid splitting")] = None,
+                    font_size: typing.Annotated[int, interactions.slash_float_option("relative size of caption")] = 1,
                     ) -> None:
         await util.preprocess(ctx)
         filename = os.path.join("cogs", "images", image)
         if (caption == None):
-            await ctx.send(file=filename)  # might need to sanitize this
+            await ctx.send(file=filename)  # TODO sanitize this
         else:
             img = image_io.from_file(open(filename, "rb"))
             img = basic.add_caption(img, caption, font_size)

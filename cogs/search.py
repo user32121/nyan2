@@ -1,5 +1,6 @@
 import logging
 import re
+import typing
 
 import interactions
 
@@ -16,11 +17,10 @@ class Search(interactions.Extension):
 
     @interactions.slash_command(**util.command_args, name="search", description="search for a substring and get stats")
     async def search(self, ctx: interactions.SlashContext,
-                     query: interactions.slash_str_option("text to search for", True),  # type: ignore
-                     regex: interactions.slash_bool_option("whether to use regex matching") = False,  # type: ignore
-                     count_by: interactions.slash_str_option("how to count occurrences",  # type: ignore
-                                                             choices=util.as_choices(["instances", "messages"])) = "instances",
-                     reply: interactions.slash_bool_option("whether to reply to the first match") = False,  # type: ignore
+                     query: typing.Annotated[str, interactions.slash_str_option("text to search for", True)],
+                     regex: typing.Annotated[bool, interactions.slash_bool_option("whether to use regex matching")] = False,
+                     count_by: typing.Annotated[str, interactions.slash_str_option("how to count occurrences", choices=util.as_choices(["instances", "messages"]))] = "instances",
+                     reply: typing.Annotated[bool, interactions.slash_bool_option("whether to reply to the first match")] = False,
                      ) -> None:
         await util.preprocess(ctx)
         await scan.fill_cache(ctx.bot, ctx.channel, ctx)
@@ -30,6 +30,7 @@ class Search(interactions.Extension):
         else:
             def matches(s: str) -> int:
                 return s.lower().count(query.lower())
+
         match_counts: dict[int, int] = {}
         counts: dict[int, int] = {}
         for message_id, author_id, content in scan.message_cache[ctx.channel_id]:
@@ -44,6 +45,7 @@ class Search(interactions.Extension):
             if (match_count):
                 match_counts[author_id] = match_counts.get(author_id, 0) + match_count
             counts[author_id] = counts.get(author_id, 0) + 1
+
         sorted_counts = sorted(match_counts.items(), key=lambda x: x[1], reverse=True)
         output = f"total matches: {sum(match_counts.values())}/{sum(counts.values())} ({round(sum(match_counts.values())/sum(counts.values()), 3)})"
         for author_id, match_count in sorted_counts:
