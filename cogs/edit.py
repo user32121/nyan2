@@ -192,25 +192,28 @@ class Edit(interactions.Extension):
                       delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
                       frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 30,
                       cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
-                      x_scale: typing.Annotated[float, interactions.slash_float_option("closeness of vertical stripes")] = 1,
-                      y_scale: typing.Annotated[float, interactions.slash_float_option("closeness of horizontal stripes")] = 1,
+                      scale_x: typing.Annotated[float, interactions.slash_float_option("closeness of vertical stripes")] = 1,
+                      scale_y: typing.Annotated[float, interactions.slash_float_option("closeness of horizontal stripes")] = 1,
                       ) -> None:
         await util.preprocess(ctx)
         img = await image_io.from_url(ctx, file.proxy_url)
-        img = animated.hueshift(img, delay, frames, cycles, x_scale, y_scale)
+        img = animated.hueshift(img, delay, frames, cycles, scale_x, scale_y)
         await image_io.send_file(ctx, img)
 
-    @animated_group.subcommand(sub_cmd_name="caramelldansen", sub_cmd_description="not implemented")
-    async def caramelldansen(self, ctx: interactions.SlashContext,
-                             file: file_option,
-                             ) -> None:
-        await util.not_implemented(ctx)
-
-    @animated_group.subcommand(sub_cmd_name="spin", sub_cmd_description="not implemented")
+    @animated_group.subcommand(sub_cmd_name="spin", sub_cmd_description="stretch the center around")
     async def spin(self, ctx: interactions.SlashContext,
                    file: file_option,
+                   delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
+                   frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 5,
+                   cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
+                   radius: typing.Annotated[float, interactions.slash_float_option("strength of the offset, normalized")] = 0.5,
+                   center_x: typing.Annotated[float, interactions.slash_float_option("center of the spin, normalized")] = 0,
+                   center_y: typing.Annotated[float, interactions.slash_float_option("center of the spin, normalized")] = 0,
                    ) -> None:
-        await util.not_implemented(ctx)
+        await util.preprocess(ctx)
+        img = await image_io.from_url(ctx, file.proxy_url)
+        img = await animated.spin(ctx, img, delay, frames, cycles, radius, center_x, center_y)
+        await image_io.send_file(ctx, img)
 
     @animated_group.subcommand(sub_cmd_name="squish", sub_cmd_description="not implemented")
     async def squish(self, ctx: interactions.SlashContext,
