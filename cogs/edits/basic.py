@@ -1,5 +1,4 @@
 import logging
-import re
 import typing
 
 import interactions
@@ -15,15 +14,16 @@ logger = logging.getLogger(__name__)
 
 
 def add_caption(imgs: list[image_io.ImageFrame], text: str, relative_font_size: float = 1) -> list[image_io.ImageFrame]:
-    text = text.replace(r"\\", "\0")
-    m = re.fullmatch(r"(.+?)(?<!\\)(?:,(.+))?", text)
-    if (m == None):
-        texts = [text, ""]
-    else:
-        texts = [m[1], m[2] or ""]
+    text = text.replace(r"\\", chr(0))
+    text = text.replace(r"\,", chr(1))
+    text = text.replace(r"\n", chr(2))
+    texts = text.split(",")
+    if (len(texts) < 2):
+        texts.append("")
     for i in range(2):
-        texts[i] = texts[i].replace(r"\,", ",")
-        texts[i] = texts[i].replace("\0", "\\")
+        texts[i] = texts[i].replace(chr(0), "\\")
+        texts[i] = texts[i].replace(chr(1), ",")
+        texts[i] = texts[i].replace(chr(1), "\n")
 
     for img in imgs:
         font_size = int(img.frame.width / 15 * relative_font_size)
