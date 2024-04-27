@@ -4,7 +4,6 @@ import os
 import interactions
 import numpy as np
 import numpy.typing
-import PIL
 import PIL.Image
 
 from . import image_io, misc
@@ -108,3 +107,19 @@ def boom(imgs: list[image_io.ImageFrame], delay: int, frames: int,  amount: floa
     for i in range(len(boom_imgs)):
         boom_imgs[i].frame = boom_imgs[i].frame.resize(imgs[0].frame.size)
     return imgs + boom_imgs
+
+
+def squish(imgs: list[image_io.ImageFrame], delay: int, frames: int,  cycles: float, amount: float) -> list[image_io.ImageFrame]:
+    if (len(imgs) == 1):
+        imgs *= frames
+        delays = [delay]*frames
+    else:
+        delays = [x.duration for x in imgs]
+    thetas = np.linspace(0, 2 * np.pi * cycles, len(imgs)+1)
+    for i in range(len(imgs)):
+        factor = 2 ** (np.sin(thetas[i]) * amount)
+        img = imgs[i].frame.resize((int(imgs[i].frame.width * factor), int(imgs[i].frame.height / factor)))
+        img2 = PIL.Image.new("RGBA", imgs[i].frame.size, "white")
+        img2.alpha_composite(img, ((img2.width - img.width) // 2, (img2.height - img.height) // 2))
+        imgs[i] = image_io.ImageFrame(img2, delays[i])
+    return imgs

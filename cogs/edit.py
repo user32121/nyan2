@@ -223,11 +223,18 @@ class Edit(interactions.Extension):
         img = await animated.spin(ctx, img, delay, frames, cycles, radius, center_x, center_y)
         await image_io.send_file(ctx, img)
 
-    @animated_group.subcommand(sub_cmd_name="squish", sub_cmd_description="not implemented")
+    @animated_group.subcommand(sub_cmd_name="squish", sub_cmd_description="stretch horizontally and vertically")
     async def squish(self, ctx: interactions.SlashContext,
                      file: file_option,
+                     delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
+                     frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 10,
+                     cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
+                     amount: typing.Annotated[float, interactions.slash_float_option("stretch multiplier")] = 0.5,
                      ) -> None:
-        await util.not_implemented(ctx)
+        await util.preprocess(ctx)
+        img = await image_io.from_url(ctx, file.proxy_url)
+        img = animated.squish(img, delay, frames, cycles, amount)
+        await image_io.send_file(ctx, img)
 
     @misc_group.subcommand(sub_cmd_name="snap", sub_cmd_description="not implemented")
     async def snap(self, ctx: interactions.SlashContext,
