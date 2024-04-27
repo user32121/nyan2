@@ -2,9 +2,9 @@ import logging
 
 import interactions
 import numpy as np
+import numpy.typing
 import PIL
 import PIL.Image
-from matplotlib import pyplot as plt
 
 from . import image_io
 
@@ -32,7 +32,7 @@ def hueshift(imgs: list[image_io.ImageFrame], delay: int, frames: int, cycles: f
     return imgs
 
 
-def normalize_coordinates(coords: np.ndarray, shape: tuple[int, ...]) -> np.ndarray:
+def normalize_coordinates(coords: np.ndarray, shape: numpy.typing.ArrayLike) -> np.ndarray:
     # convert integer coordinates to [-1,1] range
     centerd = coords - np.array(shape) / 2
     m = np.min(shape)
@@ -40,7 +40,7 @@ def normalize_coordinates(coords: np.ndarray, shape: tuple[int, ...]) -> np.ndar
     return scaled
 
 
-def unnormalize_coordinates(coords: np.ndarray, shape: tuple[int, ...]) -> np.ndarray:
+def unnormalize_coordinates(coords: np.ndarray, shape: numpy.typing.ArrayLike) -> np.ndarray:
     m = np.min(shape)
     centered = coords * m / 2
     unnormalized = centered + np.array(shape) / 2
@@ -51,7 +51,7 @@ def centered_score(x: np.ndarray, center: float) -> np.ndarray:
     return np.maximum(1 - np.abs(x-center), 0)
 
 
-def cubic(t: np.ndarray, ar: np.ndarray):
+def cubic(t: np.ndarray, ar: np.ndarray) -> np.ndarray:
     # https://www.desmos.com/calculator/pqkx8j4ulh
     return -2 * t**3 * ar + 3 * t**2 * ar
 

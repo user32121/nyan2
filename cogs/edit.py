@@ -5,7 +5,7 @@ import interactions
 
 import util
 
-from .edits import basic, blur, image_io, animated
+from .edits import animated, basic, blur, image_io, misc
 
 logger = logging.getLogger(__name__)
 base_command = interactions.SlashCommand(**util.command_args, name="edit", description="various image edits")
@@ -207,8 +207,8 @@ class Edit(interactions.Extension):
                    frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 5,
                    cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
                    radius: typing.Annotated[float, interactions.slash_float_option("strength of the offset, normalized")] = 0.5,
-                   center_x: typing.Annotated[float, interactions.slash_float_option("center of the spin, normalized")] = 0,
-                   center_y: typing.Annotated[float, interactions.slash_float_option("center of the spin, normalized")] = 0,
+                   center_x: typing.Annotated[float, interactions.slash_float_option("normalized to [-1,1]")] = 0,
+                   center_y: typing.Annotated[float, interactions.slash_float_option("normalized to [-1,1]")] = 0,
                    ) -> None:
         await util.preprocess(ctx)
         img = await image_io.from_url(ctx, file.proxy_url)
@@ -233,11 +233,17 @@ class Edit(interactions.Extension):
                     ) -> None:
         await util.not_implemented(ctx)
 
-    @misc_group.subcommand(sub_cmd_name="bulge", sub_cmd_description="not implemented")
+    @misc_group.subcommand(sub_cmd_name="bulge", sub_cmd_description="add a bulge")
     async def bulge(self, ctx: interactions.SlashContext,
                     file: file_option,
+                    amount: typing.Annotated[float, interactions.slash_float_option("strength of the bulge")] = 1,
+                    center_x: typing.Annotated[float, interactions.slash_float_option("normalized to [-1,1]")] = 0,
+                    center_y: typing.Annotated[float, interactions.slash_float_option("normalized to [-1,1]")] = 0,
                     ) -> None:
-        await util.not_implemented(ctx)
+        await util.preprocess(ctx)
+        img = await image_io.from_url(ctx, file.proxy_url)
+        img = misc.bulge(img, amount, center_x, center_y)
+        await image_io.send_file(ctx, img)
 
     @misc_group.subcommand(sub_cmd_name="break", sub_cmd_description="not implemented")
     async def break_(self, ctx: interactions.SlashContext,
