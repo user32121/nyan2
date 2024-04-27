@@ -19,9 +19,9 @@ class ImageFrame:
 def from_file(file: io.IOBase) -> list[ImageFrame]:
     img = PIL.Image.open(file)
     imgs: list[ImageFrame] = []
-    for i in range(img.n_frames):
+    for i in range(getattr(img, "n_frames", 1)):
         img.seek(i)
-        imgs.append(ImageFrame(img.convert(), img.info.get("duration", 0)))
+        imgs.append(ImageFrame(img.convert("RGBA"), img.info.get("duration", 0)))
     return imgs
 
 
