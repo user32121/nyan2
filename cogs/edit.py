@@ -168,11 +168,19 @@ class Edit(interactions.Extension):
         img = blur.circularblur(img, angle, interpolation)
         await image_io.send_file(ctx, img)
 
-    @animated_group.subcommand(sub_cmd_name="boom", sub_cmd_description="not implemented")
+    @animated_group.subcommand(sub_cmd_name="boom", sub_cmd_description="explosion")
     async def boom(self, ctx: interactions.SlashContext,
                    file: file_option,
+                   delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
+                   frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 10,
+                   amount: typing.Annotated[float, interactions.slash_float_option("strength")] = 1,
+                   center_x: typing.Annotated[float, interactions.slash_float_option("normalized to [-1,1]")] = 0,
+                   center_y: typing.Annotated[float, interactions.slash_float_option("normalized to [-1,1]")] = 0,
                    ) -> None:
-        await util.not_implemented(ctx)
+        await util.preprocess(ctx)
+        img = await image_io.from_url(ctx, file.proxy_url)
+        img = animated.boom(img, delay, frames, amount, center_x, center_y)
+        await image_io.send_file(ctx, img)
 
     @animated_group.subcommand(sub_cmd_name="rave", sub_cmd_description="apply a hue shift that changes with time")
     async def rave(self, ctx: interactions.SlashContext,
@@ -236,7 +244,7 @@ class Edit(interactions.Extension):
     @misc_group.subcommand(sub_cmd_name="bulge", sub_cmd_description="add a bulge")
     async def bulge(self, ctx: interactions.SlashContext,
                     file: file_option,
-                    amount: typing.Annotated[float, interactions.slash_float_option("strength of the bulge")] = 1,
+                    amount: typing.Annotated[float, interactions.slash_float_option("strength")] = 1,
                     center_x: typing.Annotated[float, interactions.slash_float_option("normalized to [-1,1]")] = 0,
                     center_y: typing.Annotated[float, interactions.slash_float_option("normalized to [-1,1]")] = 0,
                     ) -> None:

@@ -1,4 +1,5 @@
 import logging
+import os
 
 import interactions
 import numpy as np
@@ -6,7 +7,7 @@ import numpy.typing
 import PIL
 import PIL.Image
 
-from . import image_io
+from . import image_io, misc
 
 logger = logging.getLogger(__name__)
 
@@ -90,3 +91,20 @@ async def spin(ctx: interactions.SlashContext, imgs: list[image_io.ImageFrame], 
         imgs[i] = image_io.ImageFrame(PIL.Image.fromarray(ar2, "RGBA"), delays[i])
     await ctx.edit(content="edit finished")
     return imgs
+
+
+def boom(imgs: list[image_io.ImageFrame], delay: int, frames: int,  amount: float, center_x: float, center_y: float) -> list[image_io.ImageFrame]:
+    if (len(imgs) == 1):
+        imgs *= frames
+        delays = [delay]*frames
+    else:
+        delays = [x.duration for x in imgs]
+    amounts = np.linspace(0, amount, len(imgs)+1)
+    for i in range(len(imgs)):
+        img = image_io.ImageFrame(imgs[i].frame.copy(), 0)
+        img = misc.bulge([img], amounts[i], center_x, center_y)[0]
+        imgs[i] = image_io.ImageFrame(img.frame, delays[i])
+    boom_imgs = image_io.from_file(open(os.path.join("cogs", "images", "boom.gif"), "rb"))
+    for i in range(len(boom_imgs)):
+        boom_imgs[i].frame = boom_imgs[i].frame.resize(imgs[0].frame.size)
+    return imgs + boom_imgs

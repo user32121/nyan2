@@ -14,7 +14,7 @@ def bulge(imgs: list[image_io.ImageFrame], amount: float, center_x: float, cente
         xys = xys - [center_y, center_x]
         dists = np.linalg.norm(xys, axis=2)
         dists = np.minimum(dists, 1)
-        xys *= np.expand_dims(dists ** ((1.5 ** amount) - 1), axis=2)
+        xys *= np.expand_dims(dists ** ((2 ** amount) - 1), axis=2)
         xys = xys + [center_y, center_x]
         xys = animated.unnormalize_coordinates(xys, shape).astype(int)
         xys = np.clip(xys, 0, np.array(shape)-1)
