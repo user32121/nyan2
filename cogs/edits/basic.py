@@ -1,10 +1,10 @@
 import logging
 import typing
 
-import PIL.ImageColor
 import interactions
 import numpy as np
 import PIL.Image
+import PIL.ImageColor
 import PIL.ImageDraw
 import PIL.ImageFilter
 import PIL.ImageFont
@@ -57,10 +57,11 @@ class ColourConverter(interactions.Converter):
             return (*res, 255)
         return res
 
+
 def hsv_hue(imgs: list[image_io.ImageFrame]) -> list[image_io.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("HSV"))
-        ar[:, :, [1, 2]] = 255
+        ar[np.expand_dims(((ar[:, :, 0:2] != 0).any(axis=2)), axis=2) & [[[False, True, True]]]] = 255
         imgs[i].frame = PIL.Image.fromarray(ar, "HSV").convert("RGBA")
     return imgs
 
