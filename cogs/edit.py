@@ -247,11 +247,15 @@ class Edit(interactions.Extension):
         img = misc.snap(img, steps, fuzzy)
         await image_io.send_file(ctx, img)
 
-    @misc_group.subcommand(sub_cmd_name="magic", sub_cmd_description="not implemented")
+    @misc_group.subcommand(sub_cmd_name="magic", sub_cmd_description="spread out pixels")
     async def magic(self, ctx: interactions.SlashContext,
                     file: file_option,
+                    steps: typing.Annotated[float, interactions.slash_float_option("number of steps, normalized (multiplied by number of pixels)", min_value=0)] = 2,
                     ) -> None:
-        await util.not_implemented(ctx)
+        await util.preprocess(ctx)
+        img = image_io.from_url(file.proxy_url)
+        img = misc.magic(img, steps)
+        await image_io.send_file(ctx, img)
 
     @misc_group.subcommand(sub_cmd_name="bulge", sub_cmd_description="add a bulge")
     async def bulge(self, ctx: interactions.SlashContext,

@@ -31,7 +31,7 @@ def bulge(imgs: list[image_io.ImageFrame], amount: float, center_x: float, cente
 def snap(imgs: list[image_io.ImageFrame], steps: float, fuzzy: bool) -> list[image_io.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
-        xy = animated.unnormalize_coordinates(np.random.random(2) * 2 - 1, ar.shape[:2] - np.array([1, 1])).astype(int)
+        xy = animated.unnormalize_coordinates(np.random.random(2) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
         for _ in range(int(steps * imgs[i].frame.width * imgs[i].frame.height)):
             p = ar[xy[0], xy[1]]
             dir = random.randint(0, 3)
@@ -43,5 +43,17 @@ def snap(imgs: list[image_io.ImageFrame], steps: float, fuzzy: bool) -> list[ima
             ar[xy[0], xy[1]] = p2
             ar[xy2[0], xy2[1]] = p
             xy = xy2
+        imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
+    return imgs
+
+
+def magic(imgs: list[image_io.ImageFrame], steps: float) -> list[image_io.ImageFrame]:
+    for i in range(len(imgs)):
+        ar = np.array(imgs[i].frame.convert("RGBA"))
+        for _ in range(int(steps * imgs[i].frame.width * imgs[i].frame.height)):
+            xy = animated.unnormalize_coordinates(np.random.random(2) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
+            xy2 = xy + [[0, 1], [1, 0], [0, -1], [-1, 0]]
+            xy2 = xy2 % ar.shape[:2]
+            ar[xy2[:, 0], xy2[:, 1]] = ar[xy[0], xy[1]]
         imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
     return imgs

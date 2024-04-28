@@ -32,16 +32,16 @@ def hueshift(imgs: list[image_io.ImageFrame], delay: int, frames: int, cycles: f
     return imgs
 
 
-def normalize_coordinates(coords: np.ndarray, shape: numpy.typing.ArrayLike) -> np.ndarray:
+def normalize_coordinates(coords: np.ndarray, shape: numpy.typing.ArrayLike, square=True) -> np.ndarray:
     # convert integer coordinates to [-1,1] range
     centerd = coords - np.array(shape) / 2
-    m = np.min(shape)
+    m = np.min(shape) if square else np.array(shape)
     scaled = centerd / m * 2
     return scaled
 
 
-def unnormalize_coordinates(coords: np.ndarray, shape: numpy.typing.ArrayLike) -> np.ndarray:
-    m = np.min(shape)
+def unnormalize_coordinates(coords: np.ndarray, shape: numpy.typing.ArrayLike, square=True) -> np.ndarray:
+    m = np.min(shape) if square else np.array(shape)
     centered = coords * m / 2
     unnormalized = centered + np.array(shape) / 2
     return unnormalized
