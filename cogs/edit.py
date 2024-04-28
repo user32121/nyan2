@@ -236,11 +236,16 @@ class Edit(interactions.Extension):
         img = animated.squish(img, delay, frames, cycles, amount)
         await image_io.send_file(ctx, img)
 
-    @misc_group.subcommand(sub_cmd_name="snap", sub_cmd_description="not implemented")
+    @misc_group.subcommand(sub_cmd_name="snap", sub_cmd_description="swap pixels around")
     async def snap(self, ctx: interactions.SlashContext,
                    file: file_option,
+                   steps: typing.Annotated[float, interactions.slash_float_option("number of steps, normalized (multiplied by number of pixels)", min_value=0)] = 2,
+                   fuzzy: typing.Annotated[bool, interactions.slash_bool_option("whether to blend or swap pixels")] = False,
                    ) -> None:
-        await util.not_implemented(ctx)
+        await util.preprocess(ctx)
+        img = await image_io.from_url(ctx, file.proxy_url)
+        img = misc.snap(img, steps, fuzzy)
+        await image_io.send_file(ctx, img)
 
     @misc_group.subcommand(sub_cmd_name="magic", sub_cmd_description="not implemented")
     async def magic(self, ctx: interactions.SlashContext,

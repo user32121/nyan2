@@ -1,7 +1,13 @@
+import logging
+import random
+import typing
+
 import numpy as np
 import PIL.Image
 
-from . import image_io, animated
+from . import animated, image_io
+
+logger = logging.getLogger(__name__)
 
 
 def bulge(imgs: list[image_io.ImageFrame], amount: float, center_x: float, center_y: float) -> list[image_io.ImageFrame]:
@@ -19,5 +25,24 @@ def bulge(imgs: list[image_io.ImageFrame], amount: float, center_x: float, cente
         xys = animated.unnormalize_coordinates(xys, shape).astype(int)
         xys = np.clip(xys, 0, np.array(shape)-1)
         ar = ar[xys[:, :, 0], xys[:, :, 1]]
+        imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
+    return imgs
+
+
+def snap(imgs: list[image_io.ImageFrame], steps: float, fuzzy: bool) -> list[image_io.ImageFrame]:
+    for i in range(len(imgs)):
+        ar = np.array(imgs[i].frame.convert("RGBA"))
+        xy = animated.unnormalize_coordinates(np.random.random(2) * 2 - 1, ar.shape[:2] - np.array([1, 1])).astype(int)
+        for _ in range(int(steps * imgs[i].frame.width * imgs[i].frame.height)):
+            p = ar[xy[0], xy[1]]
+            dir = random.randint(0, 3)
+            xy2 = xy + np.select([dir == 0, dir == 1, dir == 2, dir == 3], [[0, 1], [1, 0], [0, -1], [-1, 0]])
+            xy2 = xy2 % ar.shape[:2]
+            p2 = ar[xy2[0], xy2[1]]
+            if (fuzzy):
+                p = p2 = (p + p2.astype(int)) / 2
+            ar[xy[0], xy[1]] = p2
+            ar[xy2[0], xy2[1]] = p
+            xy = xy2
         imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
     return imgs
