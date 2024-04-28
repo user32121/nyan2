@@ -1,6 +1,7 @@
 import logging
 import typing
 
+import PIL.ImageColor
 import interactions
 import numpy as np
 import PIL.Image
@@ -48,25 +49,13 @@ def multiply(imgs: list[image_io.ImageFrame], color: tuple[int, int, int, int]) 
 
 class ColourConverter(interactions.Converter):
     async def convert(self, ctx: interactions.SlashContext, arg: str) -> tuple[int, int, int, int]:
-        arg = arg.strip()
-        if (arg.count(",") == 2 or arg.count(",") == 3):
-            ss = arg.split(",")
-            if (arg.count(",") == 2):
-                ss.append("255")
-            base = 10
-        elif (len(arg) >= 6 and len(arg) <= 9 and (len(arg) % 2 == 0 or arg[0] == "#")):
-            if (len(arg) % 2 == 1):
-                arg = arg[1:]
-            ss = [arg[0:2], arg[2:4], arg[4:6], arg[6:8] if len(arg) == 8 else "FF"]
-            base = 16
-        else:
-            raise interactions.errors.BadArgument("unknown colour format")
         try:
-            return typing.cast(tuple[int, int, int, int], tuple([int(x, base) for x in ss]))
+            res = PIL.ImageColor.getrgb(arg)
         except ValueError as e:
-            logger.info(e)
-            raise interactions.errors.BadArgument("bad colour format")
-
+            raise interactions.errors.BadArgument(str(e))
+        if (len(res) == 3):
+            return (*res, 255)
+        return res
 
 def hsv_hue(imgs: list[image_io.ImageFrame]) -> list[image_io.ImageFrame]:
     for i in range(len(imgs)):

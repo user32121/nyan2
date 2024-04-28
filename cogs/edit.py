@@ -14,7 +14,7 @@ blur_group = base_command.group("blur", "various blur effects")
 animated_group = base_command.group("animated", "effects that make gifs")
 misc_group = base_command.group("misc", "miscellaneous effects")
 file_option = typing.Annotated[interactions.Attachment, interactions.slash_attachment_option("the image to edit", True)]
-colour_option = typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, interactions.slash_str_option("the colour to apply; either comma separated integers or a hex colour code", True)]
+colour_option = typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, interactions.slash_str_option("the colour to apply (see PIL's getrgb() for technical details)", True)]
 
 
 class Edit(interactions.Extension):
@@ -108,7 +108,7 @@ class Edit(interactions.Extension):
     async def grid(self, ctx: interactions.SlashContext,
                    file: file_option,
                    thickness: typing.Annotated[int, interactions.slash_int_option("line thickness, in pixels")] = 1,
-                   colour: typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, interactions.slash_str_option("the colour to apply; either comma separated integers or a hex colour code")] = (0, 0, 0, 255),
+                   colour: typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, interactions.slash_str_option("the colour to apply (see PIL's getrgb() for technical details)")] = (0, 0, 0, 255),
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
