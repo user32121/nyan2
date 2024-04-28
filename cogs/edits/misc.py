@@ -1,6 +1,5 @@
 import logging
 import random
-import typing
 
 import numpy as np
 import PIL.Image

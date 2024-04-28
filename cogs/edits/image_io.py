@@ -3,7 +3,6 @@ import logging
 import tempfile
 import typing
 
-import PIL.GifImagePlugin
 import interactions
 import PIL.Image
 import requests
