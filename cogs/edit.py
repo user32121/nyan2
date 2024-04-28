@@ -48,7 +48,7 @@ class Edit(interactions.Extension):
         img = basic.multiply(img, (0, 0, 255, 255))
         await image_io.send_file(ctx, img)
 
-    @basic_group.subcommand(sub_cmd_name="hue", sub_cmd_description="isolate the HSV hue")
+    @basic_group.subcommand(sub_cmd_name="hsv_hue", sub_cmd_description="isolate the HSV hue")
     async def hue(self, ctx: interactions.SlashContext,
                   file: file_option,
                   ) -> None:
@@ -57,7 +57,7 @@ class Edit(interactions.Extension):
         img = basic.hsv_hue(img)
         await image_io.send_file(ctx, img)
 
-    @basic_group.subcommand(sub_cmd_name="saturation", sub_cmd_description="isolate the HSV saturation")
+    @basic_group.subcommand(sub_cmd_name="hsv_saturation", sub_cmd_description="isolate the HSV saturation")
     async def saturation(self, ctx: interactions.SlashContext,
                          file: file_option,
                          ) -> None:
@@ -66,7 +66,7 @@ class Edit(interactions.Extension):
         img = basic.hsv_saturation(img)
         await image_io.send_file(ctx, img)
 
-    @basic_group.subcommand(sub_cmd_name="value", sub_cmd_description="isolate the HSV value")
+    @basic_group.subcommand(sub_cmd_name="hsv_value", sub_cmd_description="isolate the HSV value")
     async def value(self, ctx: interactions.SlashContext,
                     file: file_option,
                     ) -> None:
