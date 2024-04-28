@@ -117,8 +117,8 @@ def squish(imgs: list[image_io.ImageFrame], delay: int, frames: int,  cycles: fl
         delays = [x.duration for x in imgs]
     thetas = np.linspace(0, 2 * np.pi * cycles, len(imgs)+1)
     for i in range(len(imgs)):
-        factor = 2 ** (np.sin(thetas[i]) * amount)
-        img = imgs[i].frame.resize((int(imgs[i].frame.width * factor), int(imgs[i].frame.height / factor)))
+        factor = 2 ** (np.sin(thetas[i]) * amount / 2)
+        img = imgs[i].frame.resize((int(imgs[i].frame.width * factor), int(imgs[i].frame.width / factor)))
         img2 = PIL.Image.new("RGBA", imgs[i].frame.size, "white")
         img2.alpha_composite(img, ((img2.width - img.width) // 2, (img2.height - img.height) // 2))
         imgs[i] = image_io.ImageFrame(img2, delays[i])

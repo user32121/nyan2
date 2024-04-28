@@ -186,7 +186,7 @@ class Edit(interactions.Extension):
     async def rave(self, ctx: interactions.SlashContext,
                    file: file_option,
                    delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 100,
-                   frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 10,
+                   frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 18,
                    cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
                    ) -> None:
         await util.preprocess(ctx)
@@ -198,7 +198,7 @@ class Edit(interactions.Extension):
     async def rainbow(self, ctx: interactions.SlashContext,
                       file: file_option,
                       delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 100,
-                      frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 30,
+                      frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 18,
                       cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
                       scale_x: typing.Annotated[float, interactions.slash_float_option("closeness of vertical stripes")] = 1,
                       scale_y: typing.Annotated[float, interactions.slash_float_option("closeness of horizontal stripes")] = 1,
@@ -211,7 +211,7 @@ class Edit(interactions.Extension):
     @animated_group.subcommand(sub_cmd_name="spin", sub_cmd_description="stretch the center around")
     async def spin(self, ctx: interactions.SlashContext,
                    file: file_option,
-                   delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 100,
+                   delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
                    frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 5,
                    cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
                    radius: typing.Annotated[float, interactions.slash_float_option("strength of the offset, normalized")] = 0.5,
@@ -226,10 +226,10 @@ class Edit(interactions.Extension):
     @animated_group.subcommand(sub_cmd_name="squish", sub_cmd_description="stretch horizontally and vertically")
     async def squish(self, ctx: interactions.SlashContext,
                      file: file_option,
-                     delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 100,
+                     delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
                      frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 10,
                      cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
-                     amount: typing.Annotated[float, interactions.slash_float_option("stretch multiplier")] = 0.5,
+                     amount: typing.Annotated[float, interactions.slash_float_option("stretch multiplier")] = 1,
                      ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
