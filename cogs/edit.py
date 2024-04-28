@@ -108,7 +108,7 @@ class Edit(interactions.Extension):
     async def grid(self, ctx: interactions.SlashContext,
                    file: file_option,
                    thickness: typing.Annotated[int, interactions.slash_int_option("line thickness, in pixels")] = 1,
-                   colour: typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, interactions.slash_str_option("the colour to apply; either comma separated integers or a hex colour code")] = (0, 0, 0, 0),
+                   colour: typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, interactions.slash_str_option("the colour to apply; either comma separated integers or a hex colour code")] = (0, 0, 0, 255),
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
@@ -268,12 +268,6 @@ class Edit(interactions.Extension):
         img = image_io.from_url(file.proxy_url)
         img = misc.bulge(img, amount, center_x, center_y)
         await image_io.send_file(ctx, img)
-
-    @misc_group.subcommand(sub_cmd_name="break", sub_cmd_description="not implemented")
-    async def break_(self, ctx: interactions.SlashContext,
-                     file: file_option,
-                     ) -> None:
-        await util.not_implemented(ctx)
 
     @misc_group.subcommand(sub_cmd_name="upscale", sub_cmd_description="not implemented")
     async def upscale(self, ctx: interactions.SlashContext,
