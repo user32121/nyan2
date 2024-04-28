@@ -171,8 +171,8 @@ class Edit(interactions.Extension):
     @animated_group.subcommand(sub_cmd_name="boom", sub_cmd_description="explosion")
     async def boom(self, ctx: interactions.SlashContext,
                    file: file_option,
-                   delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 100,
-                   frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 5,
+                   delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
+                   frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 10,
                    amount: typing.Annotated[float, interactions.slash_float_option("strength")] = 2,
                    center_x: typing.Annotated[float, interactions.slash_float_option("normalized to [-1,1]")] = 0,
                    center_y: typing.Annotated[float, interactions.slash_float_option("normalized to [-1,1]")] = 0,
