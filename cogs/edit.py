@@ -26,7 +26,7 @@ class Edit(interactions.Extension):
                   file: file_option,
                   ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = basic.multiply(img, (255, 0, 0, 255))
         await image_io.send_file(ctx, img)
 
@@ -35,7 +35,7 @@ class Edit(interactions.Extension):
                     file: file_option,
                     ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = basic.multiply(img, (0, 255, 0, 255))
         await image_io.send_file(ctx, img)
 
@@ -44,7 +44,7 @@ class Edit(interactions.Extension):
                    file: file_option,
                    ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = basic.multiply(img, (0, 0, 255, 255))
         await image_io.send_file(ctx, img)
 
@@ -53,7 +53,7 @@ class Edit(interactions.Extension):
                   file: file_option,
                   ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = basic.hsv_hue(img)
         await image_io.send_file(ctx, img)
 
@@ -62,7 +62,7 @@ class Edit(interactions.Extension):
                          file: file_option,
                          ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = basic.hsv_saturation(img)
         await image_io.send_file(ctx, img)
 
@@ -71,7 +71,7 @@ class Edit(interactions.Extension):
                     file: file_option,
                     ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = basic.hsv_value(img)
         await image_io.send_file(ctx, img)
 
@@ -80,7 +80,7 @@ class Edit(interactions.Extension):
                      file: file_option,
                      ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = basic.invert(img)
         await image_io.send_file(ctx, img)
 
@@ -90,7 +90,7 @@ class Edit(interactions.Extension):
                    colour: colour_option,
                    ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = basic.tint(img, colour)
         await image_io.send_file(ctx, img)
 
@@ -100,7 +100,7 @@ class Edit(interactions.Extension):
                        colour: colour_option,
                        ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = basic.multiply(img, colour)
         await image_io.send_file(ctx, img)
 
@@ -111,7 +111,7 @@ class Edit(interactions.Extension):
                    colour: typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, interactions.slash_str_option("the colour to apply; either comma separated integers or a hex colour code")] = (0, 0, 0, 0),
                    ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = basic.grid(img, thickness, colour)
         await image_io.send_file(ctx, img)
 
@@ -121,7 +121,7 @@ class Edit(interactions.Extension):
                    caption: typing.Annotated[str, interactions.slash_str_option(r"text to put on the image, separated by a ','. Escape with '\' to avoid splitting", True)],
                    ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = basic.add_caption(img, caption)
         await image_io.send_file(ctx, img)
 
@@ -131,7 +131,7 @@ class Edit(interactions.Extension):
                    radius: typing.Annotated[float, interactions.slash_float_option("in pixels")] = 5,
                    ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = blur.gaussianblur(img, radius)
         await image_io.send_file(ctx, img)
 
@@ -142,7 +142,7 @@ class Edit(interactions.Extension):
                          angle: typing.Annotated[float, interactions.slash_float_option("counter clockwise from the x axis, in degrees")] = 30,
                          ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = blur.motionblur(img, length, angle)
         await image_io.send_file(ctx, img)
 
@@ -153,7 +153,7 @@ class Edit(interactions.Extension):
                        interpolation: typing.Annotated[int, interactions.slash_int_option("number of interpolated values; more means higher quality, but slower", min_value=1)] = 30,
                        ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = blur.zoomblur(img, zoom, interpolation)
         await image_io.send_file(ctx, img)
 
@@ -164,7 +164,7 @@ class Edit(interactions.Extension):
                            interpolation: typing.Annotated[int, interactions.slash_int_option("number of interpolated values; more means higher quality, but slower", min_value=1)] = 30,
                            ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = blur.circularblur(img, angle, interpolation)
         await image_io.send_file(ctx, img)
 
@@ -178,7 +178,7 @@ class Edit(interactions.Extension):
                    center_y: typing.Annotated[float, interactions.slash_float_option("normalized to [-1,1]")] = 0,
                    ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = animated.boom(img, delay, frames, amount, center_x, center_y)
         await image_io.send_file(ctx, img)
 
@@ -190,7 +190,7 @@ class Edit(interactions.Extension):
                    cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
                    ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = animated.hueshift(img, delay, frames, cycles, 0, 0)
         await image_io.send_file(ctx, img)
 
@@ -204,7 +204,7 @@ class Edit(interactions.Extension):
                       scale_y: typing.Annotated[float, interactions.slash_float_option("closeness of horizontal stripes")] = 1,
                       ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = animated.hueshift(img, delay, frames, cycles, scale_x, scale_y)
         await image_io.send_file(ctx, img)
 
@@ -219,7 +219,7 @@ class Edit(interactions.Extension):
                    center_y: typing.Annotated[float, interactions.slash_float_option("normalized to [-1,1]")] = 0,
                    ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = await animated.spin(ctx, img, delay, frames, cycles, radius, center_x, center_y)
         await image_io.send_file(ctx, img)
 
@@ -232,7 +232,7 @@ class Edit(interactions.Extension):
                      amount: typing.Annotated[float, interactions.slash_float_option("stretch multiplier")] = 0.5,
                      ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = animated.squish(img, delay, frames, cycles, amount)
         await image_io.send_file(ctx, img)
 
@@ -243,7 +243,7 @@ class Edit(interactions.Extension):
                    fuzzy: typing.Annotated[bool, interactions.slash_bool_option("whether to blend or swap pixels")] = False,
                    ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = misc.snap(img, steps, fuzzy)
         await image_io.send_file(ctx, img)
 
@@ -261,7 +261,7 @@ class Edit(interactions.Extension):
                     center_y: typing.Annotated[float, interactions.slash_float_option("normalized to [-1,1]")] = 0,
                     ) -> None:
         await util.preprocess(ctx)
-        img = await image_io.from_url(ctx, file.proxy_url)
+        img = image_io.from_url(file.proxy_url)
         img = misc.bulge(img, amount, center_x, center_y)
         await image_io.send_file(ctx, img)
 

@@ -3,6 +3,7 @@ import logging
 import tempfile
 import typing
 
+import PIL.GifImagePlugin
 import interactions
 import PIL.Image
 import requests
@@ -32,6 +33,8 @@ def to_file(imgs: list[ImageFrame]) -> tuple[tempfile._TemporaryFileWrapper, str
         ext = "png"
     else:
         ext = "gif"
+        for img in imgs:
+            img.frame = img.frame.convert("RGB").quantize(method=PIL.Image.Quantize.MAXCOVERAGE)
     frames = [x.frame for x in imgs]
     durations = [x.duration for x in imgs]
     imgs[0].frame.save(f.file, ext, save_all=True, append_images=frames[1:], loop=0, duration=durations)
@@ -39,7 +42,7 @@ def to_file(imgs: list[ImageFrame]) -> tuple[tempfile._TemporaryFileWrapper, str
     return (f, ext)
 
 
-async def from_url(ctx_update: interactions.SlashContext, url: str) -> list[ImageFrame]:
+def from_url(url: str) -> list[ImageFrame]:
     res = requests.get(url)
     with io.BytesIO(res.content) as f:
         try:
