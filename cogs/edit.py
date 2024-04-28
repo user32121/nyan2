@@ -226,8 +226,8 @@ class Edit(interactions.Extension):
     @animated_group.subcommand(sub_cmd_name="squish", sub_cmd_description="stretch horizontally and vertically")
     async def squish(self, ctx: interactions.SlashContext,
                      file: file_option,
-                     delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
-                     frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 10,
+                     delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 100,
+                     frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 5,
                      cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
                      amount: typing.Annotated[float, interactions.slash_float_option("stretch multiplier")] = 1,
                      ) -> None:
