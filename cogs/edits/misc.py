@@ -3,6 +3,7 @@ import random
 
 import numpy as np
 import PIL.Image
+import torch
 
 from . import animated, image_io
 
@@ -29,6 +30,7 @@ def bulge(imgs: list[image_io.ImageFrame], amount: float, center_x: float, cente
 
 
 def snap(imgs: list[image_io.ImageFrame], steps: float, fuzzy: bool) -> list[image_io.ImageFrame]:
+    # TODO optimize by batching
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         xy = animated.unnormalize_coordinates(np.random.random(2) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
@@ -48,6 +50,7 @@ def snap(imgs: list[image_io.ImageFrame], steps: float, fuzzy: bool) -> list[ima
 
 
 def magic(imgs: list[image_io.ImageFrame], steps: float) -> list[image_io.ImageFrame]:
+    # TODO optimize by batching
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         for _ in range(int(steps * imgs[i].frame.width * imgs[i].frame.height)):
@@ -56,4 +59,13 @@ def magic(imgs: list[image_io.ImageFrame], steps: float) -> list[image_io.ImageF
             xy2 = xy2 % ar.shape[:2]
             ar[xy2[:, 0], xy2[:, 1]] = ar[xy[0], xy[1]]
         imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
+    return imgs
+
+
+upscale_model = torch.hub.load("nagadomi/nunif:master", "waifu2x", method="scale", noise_level=3)  # , trust_repo=False)
+
+
+def upscale(imgs: list[image_io.ImageFrame]) -> list[image_io.ImageFrame]:
+    for img in imgs:
+        img.frame = upscale_model.infer(img.frame)
     return imgs

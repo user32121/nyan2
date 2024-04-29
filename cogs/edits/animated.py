@@ -76,6 +76,7 @@ async def spin(ctx: interactions.SlashContext, imgs: list[image_io.ImageFrame], 
         xys = xys + cubic(centered_score(xys[:, :, :1], center_y), cubic(centered_score(xys[:, :, 1:], center_x), offset.reshape((1, 1, 2))))
         # I don't think there's a way to conveniently vectorize this
         ar2 = np.zeros_like(ar)
+        # TODO optimize by precomputing TBLR
         for j in range(1, shape[0]):
             for k in range(1, shape[1]):
                 T1, L1 = unnormalize_coordinates(xys[j-1, k-1], shape)

@@ -269,11 +269,14 @@ class Edit(interactions.Extension):
         img = misc.bulge(img, amount, center_x, center_y)
         await image_io.send_file(ctx, img)
 
-    @misc_group.subcommand(sub_cmd_name="upscale", sub_cmd_description="not implemented")
+    @misc_group.subcommand(sub_cmd_name="upscale", sub_cmd_description="double the image size using Waifu2x")
     async def upscale(self, ctx: interactions.SlashContext,
                       file: file_option,
                       ) -> None:
-        await util.not_implemented(ctx)
+        await util.preprocess(ctx)
+        img = image_io.from_url(file.proxy_url)
+        img = misc.upscale(img)
+        await image_io.send_file(ctx, img)
 
     @misc_group.subcommand(sub_cmd_name="downscale", sub_cmd_description="not implemented")
     async def downscale(self, ctx: interactions.SlashContext,
