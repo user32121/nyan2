@@ -66,6 +66,7 @@ upscale_model = torch.hub.load("nagadomi/nunif:master", "waifu2x", method="scale
 
 
 def upscale(imgs: list[image_io.ImageFrame]) -> list[image_io.ImageFrame]:
+    # TODO multiprocessing
     for img in imgs:
         img.frame = upscale_model.infer(img.frame)
     return imgs

@@ -17,6 +17,7 @@ file_option = typing.Annotated[interactions.Attachment, interactions.slash_attac
 colour_option = typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, interactions.slash_str_option("the colour to apply (see PIL's getrgb() for technical details)", True)]
 
 
+# TODO handle large files
 class Edit(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
@@ -220,7 +221,7 @@ class Edit(interactions.Extension):
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = await animated.spin(ctx, img, delay, frames, cycles, radius, center_x, center_y)
+        img = animated.spin(img, delay, frames, cycles, radius, center_x, center_y)
         await image_io.send_file(ctx, img)
 
     @animated_group.subcommand(sub_cmd_name="squish", sub_cmd_description="stretch horizontally and vertically")

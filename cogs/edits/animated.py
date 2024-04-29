@@ -56,8 +56,7 @@ def cubic(t: np.ndarray, ar: np.ndarray) -> np.ndarray:
     return -2 * t**3 * ar + 3 * t**2 * ar
 
 
-async def spin(ctx: interactions.SlashContext, imgs: list[image_io.ImageFrame], delay: int, frames: int, cycles: float, radius: float, center_x: float, center_y: float) -> list[image_io.ImageFrame]:
-    await ctx.send("this edit is very slow")
+def spin(imgs: list[image_io.ImageFrame], delay: int, frames: int, cycles: float, radius: float, center_x: float, center_y: float) -> list[image_io.ImageFrame]:
     if (len(imgs) == 1):
         imgs *= frames
         delays = [delay]*frames
@@ -65,7 +64,6 @@ async def spin(ctx: interactions.SlashContext, imgs: list[image_io.ImageFrame], 
         delays = [x.duration for x in imgs]
     thetas = np.linspace(0, cycles*2*np.pi, len(imgs)+1)
     for i in range(len(imgs)):
-        await ctx.edit(content=f"this edit is very slow ({i}/{len(imgs)})")
         ar = np.array(imgs[i].frame.convert("RGBA"))
 
         offset = radius*np.array([np.cos(thetas[i]), np.sin(thetas[i])])
@@ -74,22 +72,18 @@ async def spin(ctx: interactions.SlashContext, imgs: list[image_io.ImageFrame], 
         xys = np.reshape(xys, (*shape, 2))
         xys = normalize_coordinates(xys, shape)
         xys = xys + cubic(centered_score(xys[:, :, :1], center_y), cubic(centered_score(xys[:, :, 1:], center_x), offset.reshape((1, 1, 2))))
+        # optimize by precomputing TBLR
+        xys_unnorm = unnormalize_coordinates(xys, shape)
+        Ts = np.minimum(xys_unnorm[:-1, :-1, 0], xys_unnorm[:-1, 1:, 0]).astype(int)
+        Bs = np.maximum(xys_unnorm[1:, :-1, 0], xys_unnorm[1:, 1:, 0]).astype(int)
+        Ls = np.minimum(xys_unnorm[:-1, :-1, 1], xys_unnorm[1:, :-1, 1]).astype(int)
+        Rs = np.maximum(xys_unnorm[:-1, 1:, 1], xys_unnorm[1:, 1:, 1]).astype(int)
         # I don't think there's a way to conveniently vectorize this
         ar2 = np.zeros_like(ar)
-        # TODO optimize by precomputing TBLR
-        for j in range(1, shape[0]):
-            for k in range(1, shape[1]):
-                T1, L1 = unnormalize_coordinates(xys[j-1, k-1], shape)
-                T2, R1 = unnormalize_coordinates(xys[j-1, k], shape)
-                B1, L2 = unnormalize_coordinates(xys[j, k-1], shape)
-                B2, R2 = unnormalize_coordinates(xys[j, k], shape)
-                T = int(np.min((T1, T2)))
-                B = int(np.max((B1, B2)))
-                L = int(np.min((L1, L2)))
-                R = int(np.max((R1, R2)))
-                ar2[T:B, L:R] = ar[j, k]
+        for j in range(0, shape[0] - 1):
+            for k in range(0, shape[1] - 1):
+                ar2[Ts[j, k]:Bs[j, k], Ls[j, k]:Rs[j, k]] = ar[j, k]
         imgs[i] = image_io.ImageFrame(PIL.Image.fromarray(ar2, "RGBA"), delays[i])
-    await ctx.edit(content="edit finished")
     return imgs
 
 
