@@ -7,6 +7,8 @@ import interactions
 import PIL.Image
 import requests
 
+import config
+
 logger = logging.getLogger(__name__)
 
 
@@ -52,5 +54,11 @@ def from_url(url: str) -> list[ImageFrame]:
 
 
 async def send_file(ctx_update: interactions.SlashContext, img: list[ImageFrame]):
+    from . import misc
     f, ext = to_file(img)
+    while f.seek(0, 2) > config.MAX_FILE_SIZE:
+        await ctx_update.send(f"{f.seek(0, 2)} > {config.MAX_FILE_SIZE} bytes, downscaling...")
+        img = misc.downscale(img)
+        f, ext = to_file(img)
+    f.seek(0)
     await ctx_update.send(file=interactions.File(typing.cast(io.IOBase, f.file), f"file.{ext}"))

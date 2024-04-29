@@ -1,7 +1,6 @@
 import logging
 import os
 
-import interactions
 import numpy as np
 import numpy.typing
 import PIL.Image
