@@ -28,7 +28,7 @@ required_colour_option = typing.Annotated[tuple[int, int, int, int], basic.Colou
 colour_option = typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, slash_colour_option(required=False)]
 
 
-# TODO handle large files
+# TODO make all subcommands multiprocess/async?
 class Edit(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
@@ -285,6 +285,7 @@ class Edit(interactions.Extension):
     async def upscale(self, ctx: interactions.SlashContext,
                       file: file_option,
                       ) -> None:
+        # TODO upload to tmpfiles if too large
         await util.preprocess(ctx)
         msg = await ctx.send("processing...")
         img = image_io.from_url(file.proxy_url)
