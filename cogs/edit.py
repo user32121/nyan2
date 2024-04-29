@@ -8,6 +8,7 @@ import util
 from .edits import animated, basic, blur, image_io, misc
 
 logger = logging.getLogger(__name__)
+
 base_command = interactions.SlashCommand(**util.command_args, name="edit", description="various image edits")
 basic_group = base_command.group("basic", "simple edits")
 blur_group = base_command.group("blur", "various blur effects")

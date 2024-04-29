@@ -1,5 +1,4 @@
 import logging
-import random
 
 import numpy as np
 import PIL.Image
@@ -33,8 +32,6 @@ def snap(imgs: list[image_io.ImageFrame], steps: float, fuzzy: bool) -> list[ima
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         xys = animated.unnormalize_coordinates(np.random.random((1000, 2)) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
-        xy: None
-        xy2: None
         for _ in range(int(np.ceil(steps * imgs[i].frame.width * imgs[i].frame.height / 1000))):
             ps = ar[xys[:, 0], xys[:, 1]]
             dirs = np.random.randint(0, 3, size=1000)
@@ -51,14 +48,13 @@ def snap(imgs: list[image_io.ImageFrame], steps: float, fuzzy: bool) -> list[ima
 
 
 def magic(imgs: list[image_io.ImageFrame], steps: float) -> list[image_io.ImageFrame]:
-    # TODO optimize by batching
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
-        for _ in range(int(steps * imgs[i].frame.width * imgs[i].frame.height)):
-            xy = animated.unnormalize_coordinates(np.random.random(2) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
-            xy2 = xy + [[0, 1], [1, 0], [0, -1], [-1, 0]]
-            xy2 = xy2 % ar.shape[:2]
-            ar[xy2[:, 0], xy2[:, 1]] = ar[xy[0], xy[1]]
+        for _ in range(int(np.ceil(steps * imgs[i].frame.width * imgs[i].frame.height / 1000))):
+            xys = animated.unnormalize_coordinates(np.random.random((1000, 2)) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
+            xys2 = xys + [[[0, 1]], [[1, 0]], [[0, -1]], [[-1, 0]]]
+            xys2 = xys2 % ar.shape[:2]
+            ar[xys2[:, :, 0], xys2[:, :, 1]] = ar[xys[:, 0], xys[:, 1]]
         imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
     return imgs
 
