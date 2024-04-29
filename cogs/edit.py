@@ -14,7 +14,14 @@ blur_group = base_command.group("blur", "various blur effects")
 animated_group = base_command.group("animated", "effects that make gifs")
 misc_group = base_command.group("misc", "miscellaneous effects")
 file_option = typing.Annotated[interactions.Attachment, interactions.slash_attachment_option("the image to edit", True)]
-colour_option = typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, interactions.slash_str_option("the colour to apply (see PIL's getrgb() for technical details)", True)]
+
+
+def slash_colour_option(required):
+    return interactions.slash_str_option("the colour to apply (see PIL's getrgb() for technical details)", required=required)
+
+
+required_colour_option = typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, slash_colour_option(required=True)]
+colour_option = typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, slash_colour_option(required=False)]
 
 
 # TODO handle large files
@@ -88,7 +95,7 @@ class Edit(interactions.Extension):
     @basic_group.subcommand(sub_cmd_name="tint", sub_cmd_description="average with a colour")
     async def tint(self, ctx: interactions.SlashContext,
                    file: file_option,
-                   colour: colour_option,
+                   colour: required_colour_option,
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
@@ -98,7 +105,7 @@ class Edit(interactions.Extension):
     @basic_group.subcommand(sub_cmd_name="multiply", sub_cmd_description="multiply by a colour")
     async def multiply(self, ctx: interactions.SlashContext,
                        file: file_option,
-                       colour: colour_option,
+                       colour: required_colour_option,
                        ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
@@ -109,7 +116,7 @@ class Edit(interactions.Extension):
     async def grid(self, ctx: interactions.SlashContext,
                    file: file_option,
                    thickness: typing.Annotated[int, interactions.slash_int_option("line thickness, in pixels")] = 1,
-                   colour: typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, interactions.slash_str_option("the colour to apply (see PIL's getrgb() for technical details)")] = (0, 0, 0, 255),
+                   colour: colour_option = (0, 0, 0, 255),
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
@@ -240,7 +247,7 @@ class Edit(interactions.Extension):
     @misc_group.subcommand(sub_cmd_name="snap", sub_cmd_description="swap pixels around")
     async def snap(self, ctx: interactions.SlashContext,
                    file: file_option,
-                   steps: typing.Annotated[float, interactions.slash_float_option("number of steps, normalized (multiplied by number of pixels)", min_value=0)] = 2,
+                   steps: typing.Annotated[float, interactions.slash_float_option("approximate number of steps, normalized (multiplied by number of pixels)", min_value=0)] = 2,
                    fuzzy: typing.Annotated[bool, interactions.slash_bool_option("whether to blend or swap pixels")] = False,
                    ) -> None:
         await util.preprocess(ctx)
