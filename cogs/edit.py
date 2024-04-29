@@ -13,13 +13,13 @@ basic_group = base_command.group("basic", "simple edits")
 blur_group = base_command.group("blur", "various blur effects")
 animated_group = base_command.group("animated", "effects that make gifs")
 misc_group = base_command.group("misc", "miscellaneous effects")
-file_option = typing.Annotated[interactions.Attachment, interactions.slash_attachment_option("the image to edit", True)]
 
 
 def slash_colour_option(required):
     return interactions.slash_str_option("the colour to apply (see PIL's getrgb() for technical details)", required=required)
 
 
+file_option = typing.Annotated[interactions.Attachment, interactions.slash_attachment_option("the image to edit", True)]
 required_colour_option = typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, slash_colour_option(required=True)]
 colour_option = typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, slash_colour_option(required=False)]
 
