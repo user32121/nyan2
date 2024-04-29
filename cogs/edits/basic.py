@@ -1,12 +1,10 @@
 import logging
-import typing
 
 import interactions
 import numpy as np
 import PIL.Image
 import PIL.ImageColor
 import PIL.ImageDraw
-import PIL.ImageFilter
 import PIL.ImageFont
 
 from . import image_io

@@ -5,7 +5,7 @@ import numpy as np
 import PIL.Image
 import torch
 
-from . import animated, image_io
+from . import image_io, util
 
 logger = logging.getLogger(__name__)
 
@@ -16,13 +16,13 @@ def bulge(imgs: list[image_io.ImageFrame], amount: float, center_x: float, cente
         shape = ar.shape[:2]
         xys = list(np.ndindex(shape))
         xys = np.reshape(xys, (*shape, 2))
-        xys = animated.normalize_coordinates(xys, shape)
+        xys = util.normalize_coordinates(xys, shape)
         xys = xys - [center_y, center_x]
         dists = np.linalg.norm(xys, axis=2)
         dists = np.minimum(dists, 1)
         xys *= np.expand_dims(dists ** ((2 ** amount) - 1), axis=2)
         xys = xys + [center_y, center_x]
-        xys = animated.unnormalize_coordinates(xys, shape).astype(int)
+        xys = util.unnormalize_coordinates(xys, shape).astype(int)
         xys = np.clip(xys, 0, np.array(shape)-1)
         ar = ar[xys[:, :, 0], xys[:, :, 1]]
         imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
@@ -32,7 +32,7 @@ def bulge(imgs: list[image_io.ImageFrame], amount: float, center_x: float, cente
 def snap(imgs: list[image_io.ImageFrame], steps: float, fuzzy: bool) -> list[image_io.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
-        xys = animated.unnormalize_coordinates(np.random.random((1000, 2)) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
+        xys = util.unnormalize_coordinates(np.random.random((1000, 2)) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
         for _ in range(int(np.ceil(steps * imgs[i].frame.width * imgs[i].frame.height / 1000))):
             ps = ar[xys[:, 0], xys[:, 1]]
             dirs = np.random.randint(0, 3, size=1000)
@@ -52,7 +52,7 @@ def magic(imgs: list[image_io.ImageFrame], steps: float) -> list[image_io.ImageF
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         for _ in range(int(np.ceil(steps * imgs[i].frame.width * imgs[i].frame.height / 1000))):
-            xys = animated.unnormalize_coordinates(np.random.random((1000, 2)) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
+            xys = util.unnormalize_coordinates(np.random.random((1000, 2)) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
             xys2 = xys + [[[0, 1]], [[1, 0]], [[0, -1]], [[-1, 0]]]
             xys2 = xys2 % ar.shape[:2]
             ar[xys2[:, :, 0], xys2[:, :, 1]] = ar[xys[:, 0], xys[:, 1]]

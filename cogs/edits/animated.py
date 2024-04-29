@@ -2,10 +2,9 @@ import logging
 import os
 
 import numpy as np
-import numpy.typing
 import PIL.Image
 
-from . import image_io, misc
+from . import image_io, misc, util
 
 logger = logging.getLogger(__name__)
 
@@ -31,21 +30,6 @@ def hueshift(imgs: list[image_io.ImageFrame], delay: int, frames: int, cycles: f
     return imgs
 
 
-def normalize_coordinates(coords: np.ndarray, shape: numpy.typing.ArrayLike, square=True) -> np.ndarray:
-    # convert integer coordinates to [-1,1] range
-    centerd = coords - np.array(shape) / 2
-    m = np.min(shape) if square else np.array(shape)
-    scaled = centerd / m * 2
-    return scaled
-
-
-def unnormalize_coordinates(coords: np.ndarray, shape: numpy.typing.ArrayLike, square=True) -> np.ndarray:
-    m = np.min(shape) if square else np.array(shape)
-    centered = coords * m / 2
-    unnormalized = centered + np.array(shape) / 2
-    return unnormalized
-
-
 def centered_score(x: np.ndarray, center: float) -> np.ndarray:
     return np.maximum(1 - np.abs(x-center), 0)
 
@@ -69,10 +53,10 @@ def spin(imgs: list[image_io.ImageFrame], delay: int, frames: int, cycles: float
         shape = ar.shape[:2]
         xys = list(np.ndindex(shape))
         xys = np.reshape(xys, (*shape, 2))
-        xys = normalize_coordinates(xys, shape)
+        xys = util.normalize_coordinates(xys, shape)
         xys = xys + cubic(centered_score(xys[:, :, :1], center_y), cubic(centered_score(xys[:, :, 1:], center_x), offset.reshape((1, 1, 2))))
         # optimize by precomputing TBLR
-        xys_unnorm = unnormalize_coordinates(xys, shape)
+        xys_unnorm = util.unnormalize_coordinates(xys, shape)
         Ts = np.minimum(xys_unnorm[:-1, :-1, 0], xys_unnorm[:-1, 1:, 0]).astype(int)
         Bs = np.maximum(xys_unnorm[1:, :-1, 0], xys_unnorm[1:, 1:, 0]).astype(int)
         Ls = np.minimum(xys_unnorm[:-1, :-1, 1], xys_unnorm[1:, :-1, 1]).astype(int)
