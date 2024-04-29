@@ -30,21 +30,22 @@ def bulge(imgs: list[image_io.ImageFrame], amount: float, center_x: float, cente
 
 
 def snap(imgs: list[image_io.ImageFrame], steps: float, fuzzy: bool) -> list[image_io.ImageFrame]:
-    # TODO optimize by batching
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
-        xy = animated.unnormalize_coordinates(np.random.random(2) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
-        for _ in range(int(steps * imgs[i].frame.width * imgs[i].frame.height)):
-            p = ar[xy[0], xy[1]]
-            dir = random.randint(0, 3)
-            xy2 = xy + np.select([dir == 0, dir == 1, dir == 2, dir == 3], [[0, 1], [1, 0], [0, -1], [-1, 0]])
-            xy2 = xy2 % ar.shape[:2]
-            p2 = ar[xy2[0], xy2[1]]
+        xys = animated.unnormalize_coordinates(np.random.random((1000, 2)) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
+        xy: None
+        xy2: None
+        for _ in range(int(np.ceil(steps * imgs[i].frame.width * imgs[i].frame.height / 1000))):
+            ps = ar[xys[:, 0], xys[:, 1]]
+            dirs = np.random.randint(0, 3, size=1000)
+            xys2 = xys + np.array([[0, 1], [1, 0], [0, -1], [-1, 0]])[dirs]
+            xys2 = xys2 % ar.shape[:2]
+            ps2 = ar[xys2[:, 0], xys2[:, 1]]
             if (fuzzy):
-                p = p2 = (p + p2.astype(int)) / 2
-            ar[xy[0], xy[1]] = p2
-            ar[xy2[0], xy2[1]] = p
-            xy = xy2
+                ps = ps2 = (ps + ps2.astype(int)) / 2
+            ar[xys[:, 0], xys[:, 1]] = ps2
+            ar[xys2[:, 0], xys2[:, 1]] = ps
+            xys = xys2
         imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
     return imgs
 

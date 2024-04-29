@@ -258,7 +258,7 @@ class Edit(interactions.Extension):
     @misc_group.subcommand(sub_cmd_name="magic", sub_cmd_description="spread out pixels")
     async def magic(self, ctx: interactions.SlashContext,
                     file: file_option,
-                    steps: typing.Annotated[float, interactions.slash_float_option("number of steps, normalized (multiplied by number of pixels)", min_value=0)] = 2,
+                    steps: typing.Annotated[float, interactions.slash_float_option("approximate number of steps, normalized (multiplied by number of pixels)", min_value=0)] = 2,
                     ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
