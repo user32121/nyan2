@@ -10,17 +10,10 @@ import util
 util.configure_logger()
 logger = logging.getLogger(__name__)
 
-bot = interactions.Client(
-    intents=interactions.Intents.DEFAULT | interactions.Intents.MESSAGE_CONTENT,
-    send_command_tracebacks=False,
-)
-
-
 @interactions.listen()
 async def on_ready():
     logger.info("Bot ready")
     await bot.change_presence(activity=interactions.Activity(f"uptime since {datetime.datetime.now(datetime.timezone.utc)}", interactions.ActivityType.WATCHING))
-
 
 @interactions.listen()
 async def on_command_error(event: interactions.events.CommandError):
@@ -35,13 +28,10 @@ async def on_command_error(event: interactions.events.CommandError):
     else:
         await ctx.send(f"an unhandled error has occurred: {err}")
 
-
-@interactions.listen()
-async def on_message_create(event: interactions.events.MessageCreate):
-    if (event.message.content.startswith("nyan ")):
-        # await event.message.reply("Nyan is moving to slash commands")
-        pass
-
-bot.load_extensions("cogs")
-
-bot.start(secret.BOT_TOKEN)
+if __name__ == "__main__":
+    bot = interactions.Client(
+        intents=interactions.Intents.DEFAULT | interactions.Intents.MESSAGE_CONTENT,
+        send_command_tracebacks=False,
+    )
+    bot.load_extensions("cogs")
+    bot.start(secret.BOT_TOKEN)

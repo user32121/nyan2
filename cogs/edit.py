@@ -1,4 +1,7 @@
+import asyncio
+import io
 import logging
+import multiprocessing
 import typing
 
 import interactions
@@ -283,9 +286,19 @@ class Edit(interactions.Extension):
                       file: file_option,
                       ) -> None:
         await util.preprocess(ctx)
+        msg = await ctx.send("processing...")
         img = image_io.from_url(file.proxy_url)
-        img = misc.upscale(img)
-        await image_io.send_file(ctx, img)
+        q = multiprocessing.Queue()
+        p = multiprocessing.Process(target=misc.upscale_multiprocess, args=(img, q))
+        p.start()
+        while (p.is_alive() and q.empty()):
+            await asyncio.sleep(10)
+        if (q.empty()):
+            raise RuntimeError(f"subprocess exited with code {p.exitcode}")
+        img = q.get(block=False)
+        f, ext = image_io.to_file(img)
+        # processing may take longer than 15 minutes (allotted defer time) so we reply to the message instead
+        await msg.reply(file=interactions.File(f.file, f"file.{ext}"))  # type: ignore
 
     @misc_group.subcommand(sub_cmd_name="downscale", sub_cmd_description="not implemented")
     async def downscale(self, ctx: interactions.SlashContext,

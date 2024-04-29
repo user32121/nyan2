@@ -1,4 +1,5 @@
 import logging
+import multiprocessing
 
 import numpy as np
 import PIL.Image
@@ -59,11 +60,8 @@ def magic(imgs: list[image_io.ImageFrame], steps: float) -> list[image_io.ImageF
     return imgs
 
 
-upscale_model = torch.hub.load("nagadomi/nunif:master", "waifu2x", method="scale", noise_level=3)  # , trust_repo=False)
-
-
-def upscale(imgs: list[image_io.ImageFrame]) -> list[image_io.ImageFrame]:
-    # TODO multiprocessing
+def upscale_multiprocess(imgs: list[image_io.ImageFrame], ret_value: multiprocessing.Queue):
+    upscale_model = torch.hub.load("nagadomi/nunif:master", "waifu2x", method="scale", noise_level=3)  # , trust_repo=False)
     for img in imgs:
         img.frame = upscale_model.infer(img.frame)
-    return imgs
+    ret_value.put(imgs)
