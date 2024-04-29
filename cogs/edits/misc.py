@@ -65,3 +65,9 @@ def upscale_multiprocess(imgs: list[image_io.ImageFrame], ret_value: multiproces
     for img in imgs:
         img.frame = upscale_model.infer(img.frame)
     ret_value.put(imgs)
+
+
+def downscale(imgs: list[image_io.ImageFrame]) -> list[image_io.ImageFrame]:
+    for img in imgs:
+        img.frame = img.frame.resize((img.frame.width // 2, img.frame.height // 2))
+    return imgs

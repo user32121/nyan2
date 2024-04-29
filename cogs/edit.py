@@ -300,11 +300,14 @@ class Edit(interactions.Extension):
         # processing may take longer than 15 minutes (allotted defer time) so we reply to the message instead
         await msg.reply(file=interactions.File(f.file, f"file.{ext}"))  # type: ignore
 
-    @misc_group.subcommand(sub_cmd_name="downscale", sub_cmd_description="not implemented")
+    @misc_group.subcommand(sub_cmd_name="downscale", sub_cmd_description="half the image size")
     async def downscale(self, ctx: interactions.SlashContext,
                         file: file_option,
                         ) -> None:
-        await util.not_implemented(ctx)
+        await util.preprocess(ctx)
+        img = image_io.from_url(file.proxy_url)
+        img = misc.downscale(img)
+        await image_io.send_file(ctx, img)
 
     @misc_group.subcommand(sub_cmd_name="random", sub_cmd_description="not implemented")
     async def random(self, ctx: interactions.SlashContext,
