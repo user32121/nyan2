@@ -284,7 +284,6 @@ class Edit(interactions.Extension):
     async def upscale(self, ctx: interactions.SlashContext,
                       file: file_option,
                       ) -> None:
-        # TODO upload to tmpfiles if too large
         await util.preprocess(ctx)
         msg = await ctx.send("processing...")
         img = image_io.from_url(file.proxy_url)

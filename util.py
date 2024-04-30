@@ -27,14 +27,14 @@ async def not_implemented(ctx: interactions.SlashContext):
     await ctx.send("Not implemented")
 
 
-class PreprocessError(Exception):
+class PreprocessingError(Exception):
     pass
 
 
 async def preprocess(ctx: interactions.SlashContext) -> None:
     await ctx.defer()
     if random.random() < 0.01:
-        raise PreprocessError("fuck off")
+        raise PreprocessingError("fuck off")
 
 
 def as_choices(choices: list[str]) -> list[interactions.SlashCommandChoice]:

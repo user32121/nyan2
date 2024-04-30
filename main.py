@@ -21,9 +21,9 @@ async def on_command_error(event: interactions.events.CommandError):
     err = event.error
     if isinstance(err, interactions.errors.Forbidden):
         await ctx.send("bot is missing permissions")
-    elif isinstance(err, interactions.errors.BadArgument):
+    elif isinstance(err, interactions.errors.BadArgument) or isinstance(err, util.ProcessingError):
         await ctx.send(f"error: {err}")
-    elif isinstance(err, util.PreprocessError):
+    elif isinstance(err, util.PreprocessingError):
         await ctx.send(str(err))
     else:
         await ctx.send(f"an unhandled error has occurred: {err}")
