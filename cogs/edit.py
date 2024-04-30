@@ -28,7 +28,6 @@ required_colour_option = typing.Annotated[tuple[int, int, int, int], basic.Colou
 colour_option = typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, slash_colour_option(required=False)]
 
 
-# TODO make all subcommands multiprocess/async?
 class Edit(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
@@ -305,10 +304,12 @@ class Edit(interactions.Extension):
     async def random(self, ctx: interactions.SlashContext,
                      file: file_option,
                      ) -> None:
+        # TODO
         await util.not_implemented(ctx)
 
     @misc_group.subcommand(sub_cmd_name="repeat", sub_cmd_description="not implemented")
     async def repeat(self, ctx: interactions.SlashContext,
                      file: file_option,
                      ) -> None:
+        # TODO
         await util.not_implemented(ctx)
