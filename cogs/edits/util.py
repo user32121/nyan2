@@ -1,3 +1,4 @@
+import interactions
 import numpy as np
 import numpy.typing
 
@@ -15,3 +16,13 @@ def unnormalize_coordinates(coords: np.ndarray, shape: numpy.typing.ArrayLike, s
     centered = coords * m / 2
     unnormalized = centered + np.array(shape) / 2
     return unnormalized
+
+
+class PsuedoContext:
+    """A class with a send method. Minimally imitates a SlashContext. For commands where the context expires before it finishes."""
+
+    def __init__(self, msg: interactions.Message) -> None:
+        self.msg = msg
+
+    async def send(self, **kwargs) -> None:
+        self.msg = await self.msg.reply(**kwargs)

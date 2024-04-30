@@ -1,5 +1,7 @@
 import io
 import logging
+import random
+import re
 import tempfile
 import typing
 
@@ -8,6 +10,9 @@ import PIL.Image
 import requests
 
 import config
+import util
+
+from . import util as edit_util
 
 logger = logging.getLogger(__name__)
 
@@ -53,12 +58,24 @@ def from_url(url: str) -> list[ImageFrame]:
             raise interactions.errors.BadArgument(f"unable to read {url} as image file")
 
 
-async def send_file(ctx_update: interactions.SlashContext, img: list[ImageFrame]):
+async def send_file(ctx_update: interactions.SlashContext | edit_util.PsuedoContext, img: list[ImageFrame], allow_downscaling=True):
     from . import misc
     f, ext = to_file(img)
-    while f.seek(0, 2) > config.MAX_FILE_SIZE:
-        await ctx_update.send(f"{f.seek(0, 2)} > {config.MAX_FILE_SIZE} bytes, downscaling...")
+    file_size = f.seek(0, 2)
+    while allow_downscaling and file_size > config.MAX_FILE_SIZE:
+        await ctx_update.send(content=f"{file_size} > {config.MAX_FILE_SIZE} bytes, downscaling...")
         img = misc.downscale(img)
         f, ext = to_file(img)
+        file_size = f.seek(0, 2)
     f.seek(0)
-    await ctx_update.send(file=interactions.File(typing.cast(io.IOBase, f.file), f"file.{ext}"))
+    if (file_size <= config.MAX_FILE_SIZE):
+        await ctx_update.send(file=interactions.File(typing.cast(io.IOBase, f.file), f"file.{ext}"))
+    else:
+        await ctx_update.send(content=f"{file_size} > {config.MAX_FILE_SIZE} bytes, using tmpfiles.org...")
+        res = requests.post(url="https://tmpfiles.org/api/v1/upload", files={"file": (f"{random.randint(0, 1 << 64):x}.{ext}", f)})
+        if (res.status_code == 200):
+            url = res.json()["data"]["url"]
+            url = re.sub(r"https:\/\/tmpfiles\.org\/(\d+\/\w+\.\w+)", r"https://tmpfiles.org/dl/\1", url)
+            await ctx_update.send(content=url)
+        else:
+            raise util.ProcessingError(res.content)

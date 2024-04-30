@@ -7,7 +7,7 @@ import interactions
 
 import util
 
-from .edits import animated, basic, blur, image_io, misc
+from .edits import animated, basic, blur, image_io, misc, util as edit_util
 
 logger = logging.getLogger(__name__)
 
@@ -296,9 +296,7 @@ class Edit(interactions.Extension):
         if (q.empty()):
             raise RuntimeError(f"subprocess exited with code {p.exitcode}")
         img = q.get(block=False)
-        f, ext = image_io.to_file(img)
-        # processing may take longer than 15 minutes (allotted defer time) so we reply to the message instead
-        await msg.reply(file=interactions.File(f.file, f"file.{ext}"))  # type: ignore
+        await image_io.send_file(edit_util.PsuedoContext(msg), img, False)
 
     @misc_group.subcommand(sub_cmd_name="downscale", sub_cmd_description="half the image size")
     async def downscale(self, ctx: interactions.SlashContext,
