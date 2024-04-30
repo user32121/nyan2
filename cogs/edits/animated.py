@@ -9,7 +9,7 @@ from . import image_io, misc, util
 logger = logging.getLogger(__name__)
 
 
-def hueshift(imgs: list[image_io.ImageFrame], delay: int, frames: int, cycles: float, scale_x: float, scale_y: float) -> list[image_io.ImageFrame]:
+def hueshift(imgs: list[util.ImageFrame], delay: int, frames: int, cycles: float, scale_x: float, scale_y: float) -> list[util.ImageFrame]:
     if (len(imgs) == 1):
         imgs *= frames
         delays = [delay]*frames
@@ -26,7 +26,7 @@ def hueshift(imgs: list[image_io.ImageFrame], delay: int, frames: int, cycles: f
         ar[:, :, 0] = ar[:, :, 0] + np.array(range(ar.shape[1])) * scale_y
         ar = np.swapaxes(ar, 0, 1)
 
-        imgs[i] = image_io.ImageFrame(PIL.Image.fromarray(ar, "HSV").convert("RGBA"), delays[i])
+        imgs[i] = util.ImageFrame(PIL.Image.fromarray(ar, "HSV").convert("RGBA"), delays[i])
     return imgs
 
 
@@ -39,7 +39,7 @@ def cubic(t: np.ndarray, ar: np.ndarray) -> np.ndarray:
     return -2 * t**3 * ar + 3 * t**2 * ar
 
 
-def spin(imgs: list[image_io.ImageFrame], delay: int, frames: int, cycles: float, radius: float, center_x: float, center_y: float) -> list[image_io.ImageFrame]:
+def spin(imgs: list[util.ImageFrame], delay: int, frames: int, cycles: float, radius: float, center_x: float, center_y: float) -> list[util.ImageFrame]:
     if (len(imgs) == 1):
         imgs *= frames
         delays = [delay]*frames
@@ -66,11 +66,11 @@ def spin(imgs: list[image_io.ImageFrame], delay: int, frames: int, cycles: float
         for j in range(0, shape[0] - 1):
             for k in range(0, shape[1] - 1):
                 ar2[Ts[j, k]:Bs[j, k], Ls[j, k]:Rs[j, k]] = ar[j, k]
-        imgs[i] = image_io.ImageFrame(PIL.Image.fromarray(ar2, "RGBA"), delays[i])
+        imgs[i] = util.ImageFrame(PIL.Image.fromarray(ar2, "RGBA"), delays[i])
     return imgs
 
 
-def boom(imgs: list[image_io.ImageFrame], delay: int, frames: int,  amount: float, center_x: float, center_y: float) -> list[image_io.ImageFrame]:
+def boom(imgs: list[util.ImageFrame], delay: int, frames: int,  amount: float, center_x: float, center_y: float) -> list[util.ImageFrame]:
     if (len(imgs) == 1):
         imgs *= frames
         delays = [delay]*frames
@@ -78,16 +78,16 @@ def boom(imgs: list[image_io.ImageFrame], delay: int, frames: int,  amount: floa
         delays = [x.duration for x in imgs]
     amounts = np.linspace(0, amount, len(imgs)+1)
     for i in range(len(imgs)):
-        img = image_io.ImageFrame(imgs[i].frame.copy(), 0)
+        img = util.ImageFrame(imgs[i].frame.copy(), 0)
         img = misc.bulge([img], amounts[i], center_x, center_y)[0]
-        imgs[i] = image_io.ImageFrame(img.frame, delays[i])
+        imgs[i] = util.ImageFrame(img.frame, delays[i])
     boom_imgs = image_io.from_file(open(os.path.join("cogs", "images", "boom.gif"), "rb"))
     for i in range(len(boom_imgs)):
         boom_imgs[i].frame = boom_imgs[i].frame.resize(imgs[0].frame.size)
     return imgs + boom_imgs
 
 
-def squish(imgs: list[image_io.ImageFrame], delay: int, frames: int,  cycles: float, amount: float) -> list[image_io.ImageFrame]:
+def squish(imgs: list[util.ImageFrame], delay: int, frames: int,  cycles: float, amount: float) -> list[util.ImageFrame]:
     if (len(imgs) == 1):
         imgs *= frames
         delays = [delay]*frames
@@ -100,5 +100,5 @@ def squish(imgs: list[image_io.ImageFrame], delay: int, frames: int,  cycles: fl
         img = imgs[i].frame.resize((int(imgs[i].frame.width * factor), int(imgs[i].frame.width / factor)))
         img2 = PIL.Image.new("RGBA", imgs[i].frame.size, "white")
         img2.alpha_composite(img, ((img2.width - img.width) // 2, (img2.height - img.height) // 2))
-        imgs[i] = image_io.ImageFrame(img2, delays[i])
+        imgs[i] = util.ImageFrame(img2, delays[i])
     return imgs

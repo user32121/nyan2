@@ -7,7 +7,8 @@ import interactions
 
 import util
 
-from .edits import animated, basic, blur, image_io, misc, util as edit_util
+from .edits import animated, basic, blur, image_io, misc
+from .edits import util as edit_util
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ class Edit(interactions.Extension):
                   ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = basic.multiply(img, (255, 0, 0, 255))
+        img = await edit_util.run_in_subprocess(basic.multiply, (img, (255, 0, 0, 255)))
         await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="green", sub_cmd_description="isolate the green component")

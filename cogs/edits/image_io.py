@@ -10,29 +10,22 @@ import PIL.Image
 import requests
 
 import config
-import util
 
-from . import util as edit_util
+from . import util
 
 logger = logging.getLogger(__name__)
 
 
-class ImageFrame:
-    def __init__(self, frame: PIL.Image.Image, duration: int) -> None:
-        self.frame = frame
-        self.duration = duration
-
-
-def from_file(file: io.IOBase) -> list[ImageFrame]:
+def from_file(file: io.IOBase) -> list[util.ImageFrame]:
     img = PIL.Image.open(file)
-    imgs: list[ImageFrame] = []
+    imgs: list[util.ImageFrame] = []
     for i in range(getattr(img, "n_frames", 1)):
         img.seek(i)
-        imgs.append(ImageFrame(img.convert("RGBA"), img.info.get("duration", 0)))
+        imgs.append(util.ImageFrame(img.convert("RGBA"), img.info.get("duration", 0)))
     return imgs
 
 
-def to_file(imgs: list[ImageFrame]) -> tuple[tempfile._TemporaryFileWrapper, str]:
+def to_file(imgs: list[util.ImageFrame]) -> tuple[tempfile._TemporaryFileWrapper, str]:
     f = tempfile.TemporaryFile()
     ext = ""
     if (len(imgs) == 1):
@@ -48,7 +41,7 @@ def to_file(imgs: list[ImageFrame]) -> tuple[tempfile._TemporaryFileWrapper, str
     return (f, ext)
 
 
-def from_url(url: str) -> list[ImageFrame]:
+def from_url(url: str) -> list[util.ImageFrame]:
     res = requests.get(url)
     with io.BytesIO(res.content) as f:
         try:
@@ -58,7 +51,7 @@ def from_url(url: str) -> list[ImageFrame]:
             raise interactions.errors.BadArgument(f"unable to read {url} as image file")
 
 
-async def send_file(ctx_update: interactions.SlashContext | edit_util.PsuedoContext, img: list[ImageFrame], allow_downscaling=True):
+async def send_file(ctx_update: interactions.SlashContext | util.PsuedoContext, img: list[util.ImageFrame], allow_downscaling=True):
     from . import misc
     f, ext = to_file(img)
     file_size = f.seek(0, 2)
@@ -78,4 +71,4 @@ async def send_file(ctx_update: interactions.SlashContext | edit_util.PsuedoCont
             url = re.sub(r"https:\/\/tmpfiles\.org\/(\d+\/\w+\.\w+)", r"https://tmpfiles.org/dl/\1", url)
             await ctx_update.send(content=url)
         else:
-            raise util.ProcessingError(res.content)
+            raise RuntimeError(res.content)

@@ -74,7 +74,3 @@ async def get_emoji(ctx: interactions.SlashContext, ids: str) -> interactions.Cu
     if (emoji == None):
         raise interactions.errors.BadArgument(f"could not find emoji {ids}")
     return emoji
-
-
-class ProcessingError(Exception):
-    pass

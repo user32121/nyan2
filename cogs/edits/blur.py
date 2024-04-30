@@ -4,16 +4,16 @@ import PIL.Image
 import PIL.ImageFilter
 import scipy
 
-from . import image_io
+from . import util
 
 
-def gaussianblur(imgs: list[image_io.ImageFrame], radius: float) -> list[image_io.ImageFrame]:
+def gaussianblur(imgs: list[util.ImageFrame], radius: float) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         imgs[i].frame = imgs[i].frame.filter(PIL.ImageFilter.GaussianBlur(radius))
     return imgs
 
 
-def motionblur(imgs: list[image_io.ImageFrame], length: int, angle: float) -> list[image_io.ImageFrame]:
+def motionblur(imgs: list[util.ImageFrame], length: int, angle: float) -> list[util.ImageFrame]:
     kernel = np.reshape([0, 0, 1, 0, 0], (5, 1))
     kernel = PIL.Image.fromarray(kernel)
     kernel = kernel.resize((length, 5))
@@ -28,7 +28,7 @@ def motionblur(imgs: list[image_io.ImageFrame], length: int, angle: float) -> li
     return imgs
 
 
-def zoomblur(imgs: list[image_io.ImageFrame], zoom: float, interpolation: int) -> list[image_io.ImageFrame]:
+def zoomblur(imgs: list[util.ImageFrame], zoom: float, interpolation: int) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ars = []
         for z in np.linspace(1, zoom, interpolation):
@@ -40,7 +40,7 @@ def zoomblur(imgs: list[image_io.ImageFrame], zoom: float, interpolation: int) -
     return imgs
 
 
-def circularblur(imgs: list[image_io.ImageFrame], angle: float, interpolation: int) -> list[image_io.ImageFrame]:
+def circularblur(imgs: list[util.ImageFrame], angle: float, interpolation: int) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ars = []
         for a in np.linspace(-angle/2, angle/2, interpolation):

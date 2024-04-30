@@ -5,12 +5,12 @@ import numpy as np
 import PIL.Image
 import torch
 
-from . import image_io, util
+from . import util
 
 logger = logging.getLogger(__name__)
 
 
-def bulge(imgs: list[image_io.ImageFrame], amount: float, center_x: float, center_y: float) -> list[image_io.ImageFrame]:
+def bulge(imgs: list[util.ImageFrame], amount: float, center_x: float, center_y: float) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         shape = ar.shape[:2]
@@ -29,7 +29,7 @@ def bulge(imgs: list[image_io.ImageFrame], amount: float, center_x: float, cente
     return imgs
 
 
-def snap(imgs: list[image_io.ImageFrame], steps: float, fuzzy: bool) -> list[image_io.ImageFrame]:
+def snap(imgs: list[util.ImageFrame], steps: float, fuzzy: bool) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         xys = util.unnormalize_coordinates(np.random.random((1000, 2)) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
@@ -48,7 +48,7 @@ def snap(imgs: list[image_io.ImageFrame], steps: float, fuzzy: bool) -> list[ima
     return imgs
 
 
-def magic(imgs: list[image_io.ImageFrame], steps: float) -> list[image_io.ImageFrame]:
+def magic(imgs: list[util.ImageFrame], steps: float) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         for _ in range(int(np.ceil(steps * imgs[i].frame.width * imgs[i].frame.height / 1000))):
@@ -60,14 +60,14 @@ def magic(imgs: list[image_io.ImageFrame], steps: float) -> list[image_io.ImageF
     return imgs
 
 
-def upscale_multiprocess(imgs: list[image_io.ImageFrame], ret_value: multiprocessing.Queue):
+def upscale_multiprocess(imgs: list[util.ImageFrame], ret_value: multiprocessing.Queue):
     upscale_model = torch.hub.load("nagadomi/nunif:master", "waifu2x", method="scale", noise_level=3)  # , trust_repo=False)
     for img in imgs:
         img.frame = upscale_model.infer(img.frame)
     ret_value.put(imgs)
 
 
-def downscale(imgs: list[image_io.ImageFrame]) -> list[image_io.ImageFrame]:
+def downscale(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
     for img in imgs:
         img.frame = img.frame.resize((img.frame.width // 2, img.frame.height // 2))
     return imgs
