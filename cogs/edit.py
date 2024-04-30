@@ -286,16 +286,10 @@ class Edit(interactions.Extension):
                       file: file_option,
                       ) -> None:
         await util.preprocess(ctx)
+        # TODO eta?
         msg = await ctx.send("processing...")
         img = image_io.from_url(file.proxy_url)
-        q = multiprocessing.Queue()
-        p = multiprocessing.Process(target=misc.upscale_multiprocess, args=(img, q))
-        p.start()
-        while (p.is_alive() and q.empty()):
-            await asyncio.sleep(10)
-        if (q.empty()):
-            raise RuntimeError(f"subprocess exited with code {p.exitcode}")
-        img = q.get(block=False)
+        img = await edit_util.run_in_subprocess(misc.upscale_multiprocess, (img,))
         await image_io.send_file(edit_util.PsuedoContext(msg), img, False)
 
     @misc_group.subcommand(sub_cmd_name="downscale", sub_cmd_description="half the image size")

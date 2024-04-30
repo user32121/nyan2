@@ -60,11 +60,11 @@ def magic(imgs: list[util.ImageFrame], steps: float) -> list[util.ImageFrame]:
     return imgs
 
 
-def upscale_multiprocess(imgs: list[util.ImageFrame], ret_value: multiprocessing.Queue):
+def upscale_multiprocess(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
     upscale_model = torch.hub.load("nagadomi/nunif:master", "waifu2x", method="scale", noise_level=3)  # , trust_repo=False)
     for img in imgs:
         img.frame = upscale_model.infer(img.frame)
-    ret_value.put(imgs)
+    return imgs
 
 
 def downscale(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
