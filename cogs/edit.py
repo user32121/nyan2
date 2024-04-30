@@ -48,7 +48,7 @@ class Edit(interactions.Extension):
                     ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = basic.multiply(img, (0, 255, 0, 255))
+        img = await edit_util.run_in_subprocess(basic.multiply, (img, (0, 255, 0, 255)))
         await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="blue", sub_cmd_description="isolate the blue component")
@@ -57,7 +57,7 @@ class Edit(interactions.Extension):
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = basic.multiply(img, (0, 0, 255, 255))
+        img = await edit_util.run_in_subprocess(basic.multiply, (img, (0, 0, 255, 255)))
         await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="hsv_hue", sub_cmd_description="isolate the HSV hue")
@@ -66,7 +66,7 @@ class Edit(interactions.Extension):
                   ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = basic.hsv_hue(img)
+        img = await edit_util.run_in_subprocess(basic.hsv_hue, (img,))
         await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="hsv_saturation", sub_cmd_description="isolate the HSV saturation")
@@ -75,7 +75,7 @@ class Edit(interactions.Extension):
                          ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = basic.hsv_saturation(img)
+        img = await edit_util.run_in_subprocess(basic.hsv_saturation, (img,))
         await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="hsv_value", sub_cmd_description="isolate the HSV value")
@@ -84,7 +84,7 @@ class Edit(interactions.Extension):
                     ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = basic.hsv_value(img)
+        img = await edit_util.run_in_subprocess(basic.hsv_value, (img,))
         await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="invert", sub_cmd_description="invert")
@@ -93,7 +93,7 @@ class Edit(interactions.Extension):
                      ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = basic.invert(img)
+        img = await edit_util.run_in_subprocess(basic.invert, (img,))
         await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="tint", sub_cmd_description="average with a colour")
@@ -103,7 +103,7 @@ class Edit(interactions.Extension):
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = basic.tint(img, colour)
+        img = await edit_util.run_in_subprocess(basic.tint, (img, colour))
         await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="multiply", sub_cmd_description="multiply by a colour")
@@ -113,7 +113,7 @@ class Edit(interactions.Extension):
                        ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = basic.multiply(img, colour)
+        img = await edit_util.run_in_subprocess(basic.multiply, (img, colour))
         await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="grid", sub_cmd_description="display a grid for easier finding of coordinates")
@@ -124,7 +124,7 @@ class Edit(interactions.Extension):
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = basic.grid(img, thickness, colour)
+        img = await edit_util.run_in_subprocess(basic.grid, (img, thickness, colour))
         await image_io.send_file(ctx, img)
 
     @basic_group.subcommand(sub_cmd_name="text", sub_cmd_description="add text")
@@ -134,7 +134,7 @@ class Edit(interactions.Extension):
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = basic.add_caption(img, caption)
+        img = await edit_util.run_in_subprocess(basic.add_caption, (img, caption))
         await image_io.send_file(ctx, img)
 
     @blur_group.subcommand(sub_cmd_name="blur", sub_cmd_description="apply a gaussian blur")
@@ -144,7 +144,7 @@ class Edit(interactions.Extension):
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = blur.gaussianblur(img, radius)
+        img = await edit_util.run_in_subprocess(blur.gaussianblur, (img, radius))
         await image_io.send_file(ctx, img)
 
     @blur_group.subcommand(sub_cmd_name="motionblur", sub_cmd_description="apply a motion blur")
@@ -155,7 +155,7 @@ class Edit(interactions.Extension):
                          ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = blur.motionblur(img, length, angle)
+        img = await edit_util.run_in_subprocess(blur.motionblur, (img, length, angle))
         await image_io.send_file(ctx, img)
 
     @blur_group.subcommand(sub_cmd_name="zoomblur", sub_cmd_description="apply a zoom blur")
@@ -166,7 +166,7 @@ class Edit(interactions.Extension):
                        ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = blur.zoomblur(img, zoom, interpolation)
+        img = await edit_util.run_in_subprocess(blur.zoomblur, (img, zoom, interpolation))
         await image_io.send_file(ctx, img)
 
     @blur_group.subcommand(sub_cmd_name="circularblur", sub_cmd_description="apply a circular blur")
@@ -177,7 +177,7 @@ class Edit(interactions.Extension):
                            ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = blur.circularblur(img, angle, interpolation)
+        img = await edit_util.run_in_subprocess(blur.circularblur, (img, angle, interpolation))
         await image_io.send_file(ctx, img)
 
     @animated_group.subcommand(sub_cmd_name="boom", sub_cmd_description="explosion")
@@ -191,7 +191,7 @@ class Edit(interactions.Extension):
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = animated.boom(img, delay, frames, amount, center_x, center_y)
+        img = await edit_util.run_in_subprocess(animated.boom, (img, delay, frames, amount, center_x, center_y))
         await image_io.send_file(ctx, img)
 
     @animated_group.subcommand(sub_cmd_name="rave", sub_cmd_description="apply a hue shift that changes with time")
@@ -203,7 +203,7 @@ class Edit(interactions.Extension):
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = animated.hueshift(img, delay, frames, cycles, 0, 0)
+        img = await edit_util.run_in_subprocess(animated.hueshift, (img, delay, frames, cycles, 0, 0))
         await image_io.send_file(ctx, img)
 
     @animated_group.subcommand(sub_cmd_name="rainbow", sub_cmd_description="apply a hue shift that changes with time and position")
@@ -217,7 +217,7 @@ class Edit(interactions.Extension):
                       ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = animated.hueshift(img, delay, frames, cycles, scale_x, scale_y)
+        img = await edit_util.run_in_subprocess(animated.hueshift, (img, delay, frames, cycles, scale_x, scale_y))
         await image_io.send_file(ctx, img)
 
     @animated_group.subcommand(sub_cmd_name="spin", sub_cmd_description="stretch the center around")
@@ -232,7 +232,7 @@ class Edit(interactions.Extension):
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = animated.spin(img, delay, frames, cycles, radius, center_x, center_y)
+        img = await edit_util.run_in_subprocess(animated.spin, (img, delay, frames, cycles, radius, center_x, center_y))
         await image_io.send_file(ctx, img)
 
     @animated_group.subcommand(sub_cmd_name="squish", sub_cmd_description="stretch horizontally and vertically")
@@ -245,7 +245,7 @@ class Edit(interactions.Extension):
                      ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = animated.squish(img, delay, frames, cycles, amount)
+        img = await edit_util.run_in_subprocess(animated.squish, (img, delay, frames, cycles, amount))
         await image_io.send_file(ctx, img)
 
     @misc_group.subcommand(sub_cmd_name="snap", sub_cmd_description="swap pixels around")
@@ -256,7 +256,7 @@ class Edit(interactions.Extension):
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = misc.snap(img, steps, fuzzy)
+        img = await edit_util.run_in_subprocess(misc.snap, (img, steps, fuzzy))
         await image_io.send_file(ctx, img)
 
     @misc_group.subcommand(sub_cmd_name="magic", sub_cmd_description="spread out pixels")
@@ -266,7 +266,7 @@ class Edit(interactions.Extension):
                     ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = misc.magic(img, steps)
+        img = await edit_util.run_in_subprocess(misc.magic, (img, steps))
         await image_io.send_file(ctx, img)
 
     @misc_group.subcommand(sub_cmd_name="bulge", sub_cmd_description="add a bulge")
@@ -278,7 +278,7 @@ class Edit(interactions.Extension):
                     ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = misc.bulge(img, amount, center_x, center_y)
+        img = await edit_util.run_in_subprocess(misc.bulge, (img, amount, center_x, center_y))
         await image_io.send_file(ctx, img)
 
     @misc_group.subcommand(sub_cmd_name="upscale", sub_cmd_description="double the image size using Waifu2x")
@@ -304,7 +304,7 @@ class Edit(interactions.Extension):
                         ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        img = misc.downscale(img)
+        img = await edit_util.run_in_subprocess(misc.downscale, (img,))
         await image_io.send_file(ctx, img)
 
     @misc_group.subcommand(sub_cmd_name="random", sub_cmd_description="not implemented")
