@@ -1,5 +1,4 @@
 import logging
-import multiprocessing
 
 import numpy as np
 import PIL.Image
@@ -60,7 +59,17 @@ def magic(imgs: list[util.ImageFrame], steps: float) -> list[util.ImageFrame]:
     return imgs
 
 
-def upscale_multiprocess(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
+def estimate_upscale_time(imgs: list[util.ImageFrame]) -> float:
+    model = np.array([0.01719520916958716, 0.015768912367664353, 0.00010084009583629158, 3.083678905690488])
+    total = 0
+    for img in imgs:
+        width = img.frame.width
+        height = img.frame.height
+        total += np.dot([width, height, width * height, 1], model)
+    return total
+
+
+def upscale(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
     upscale_model = torch.hub.load("nagadomi/nunif:master", "waifu2x", method="scale", noise_level=3)  # , trust_repo=False)
     for img in imgs:
         img.frame = upscale_model.infer(img.frame)

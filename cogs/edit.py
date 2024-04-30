@@ -1,6 +1,4 @@
-import asyncio
 import logging
-import multiprocessing
 import typing
 
 import interactions
@@ -285,10 +283,10 @@ class Edit(interactions.Extension):
                       file: file_option,
                       ) -> None:
         await util.preprocess(ctx)
-        # TODO eta?
-        msg = await ctx.send("processing...")
         img = image_io.from_url(file.proxy_url)
-        img = await edit_util.run_in_subprocess(misc.upscale_multiprocess, (img,))
+        expected_time = misc.estimate_upscale_time(img)
+        msg = await ctx.send(f"processing... (approximately {expected_time:.3f}s)")
+        img = await edit_util.run_in_subprocess(misc.upscale, (img,))
         await image_io.send_file(edit_util.PsuedoContext(msg), img, False)
 
     @misc_group.subcommand(sub_cmd_name="downscale", sub_cmd_description="half the image size")
