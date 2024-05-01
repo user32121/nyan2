@@ -25,7 +25,7 @@ def add_caption(imgs: list[util.ImageFrame], text: str, relative_font_size: floa
         texts[i] = texts[i].replace(chr(2), "\n")
 
     for img in imgs:
-        font_size = int(img.frame.width / 15 * relative_font_size)
+        font_size = int(img.frame.width / 10 * relative_font_size)
         font = PIL.ImageFont.truetype("impact.ttf", font_size)
         stroke_width = int(font_size/10)
         draw = PIL.ImageDraw.Draw(img.frame)

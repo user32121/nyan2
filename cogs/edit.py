@@ -152,6 +152,7 @@ class Edit(interactions.Extension):
     async def text(self, ctx: interactions.SlashContext,
                    file: file_option,
                    caption: typing.Annotated[str, interactions.slash_str_option(r"text to put on the image, separated by a ','. Escape with '\' to avoid splitting", True)],
+                   font_size: typing.Annotated[int, interactions.slash_float_option("relative size of caption")] = 1,
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)

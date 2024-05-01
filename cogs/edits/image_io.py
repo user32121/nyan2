@@ -26,6 +26,7 @@ def from_file(file: io.IOBase) -> list[util.ImageFrame]:
 
 
 def to_file(imgs: list[util.ImageFrame]) -> tuple[tempfile._TemporaryFileWrapper, str]:
+    # TODO perform in multiprocessing so bot doesn't stall while preparing file
     f = tempfile.TemporaryFile()
     ext = ""
     if (len(imgs) == 1):
