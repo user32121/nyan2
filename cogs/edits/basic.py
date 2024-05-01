@@ -22,7 +22,7 @@ def add_caption(imgs: list[util.ImageFrame], text: str, relative_font_size: floa
     for i in range(2):
         texts[i] = texts[i].replace(chr(0), "\\")
         texts[i] = texts[i].replace(chr(1), ",")
-        texts[i] = texts[i].replace(chr(1), "\n")
+        texts[i] = texts[i].replace(chr(2), "\n")
 
     for img in imgs:
         font_size = int(img.frame.width / 15 * relative_font_size)
