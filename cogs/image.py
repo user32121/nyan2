@@ -7,7 +7,7 @@ import interactions
 
 import util
 
-from .edits import basic, image_io
+from .edits import basic, image_io, util as edit_util
 
 logger = logging.getLogger(__name__)
 
@@ -35,5 +35,5 @@ class Image(interactions.Extension):
             await ctx.send(file=filename)
         else:
             img = image_io.from_file(open(filename, "rb"))
-            img = basic.add_caption(img, caption, font_size)
-            await image_io.send_file(ctx, img)
+            img = await edit_util.run_in_subprocess(ctx, basic.add_caption, (img, caption, font_size))
+            await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
