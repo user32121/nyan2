@@ -27,13 +27,15 @@ class Brainfuck(interactions.Extension):
                 break
             await asyncio.sleep(1)
         state.force_stop = True
+        for e in state.errors:
+            raise e
         if (len(state.timelines) > 0):
             raise interactions.errors.BadArgument("program did not terminate within time limit")
         if (state.output.tell() == 0):
             await ctx.send("no output")
         else:
             state.output.seek(0)
-            await ctx.send(f"output: `{state.output.read()}`")
+            await ctx.send(f"output: ```{state.output.read()}```")
 
 
 class ProgramState:
@@ -43,6 +45,7 @@ class ProgramState:
         self.output = output
         self.force_stop = False
         self.timelines = [Timeline(self, 0, [0], {})]
+        self.errors: list[Exception] = []
         startTimeline(self.timelines[0])
 
 
@@ -59,30 +62,67 @@ def startTimeline(tl: Timeline) -> None:
     threading.Thread(target=runTimeline, args=(tl,)).start()
 
 
+bracket1 = {"[": 1, "]": -1}
+bracket2 = {"(": 1, ")": -1}
+
+
 def runTimeline(tl: Timeline) -> None:
-    while not tl.parent.force_stop and tl.ip < len(tl.parent.program):
-        op = tl.parent.program[tl.ip]
-        if (op == "+"):
-            past: list[tuple[int, int]] = []
-            for p in tl.mps:
-                past.append((p, tl.mem[p]))
-                tl.mem[p] = (tl.mem.get(p, 0) + 1) % 256
-            tl.history.append(tuple(past))
-        elif (op == "-"):
-            past: list[tuple[int, int]] = []
-            for p in tl.mps:
-                past.append((p, tl.mem[p]))
-                tl.mem[p] = (tl.mem.get(p, 0) - 1) % 256
-            tl.history.append(tuple(past))
-        elif (op == ","):
-            past: list[tuple[int, int]] = []
-            c = (tl.parent.input.read(1) or b"\xFF")[0]
-            for p in tl.mps:
-                past.append((p, tl.mem.get(p, 0)))
-                tl.mem[p] = c
-            tl.history.append(tuple(past))
-        elif (op == "."):
-            for p in tl.mps:
-                tl.parent.output.write((tl.mem.get(p, 0)).to_bytes(1, "little"))
-        tl.ip += 1
-    tl.parent.timelines.remove(tl)
+    try:
+        while not tl.parent.force_stop and tl.ip >= 0 and tl.ip < len(tl.parent.program):
+            op = tl.parent.program[tl.ip]
+            if op == ">":
+                for i in range(len(tl.mps)):
+                    tl.mps[i] += 1
+            elif op == "<":
+                for i in range(len(tl.mps)):
+                    tl.mps[i] -= 1
+            elif op == "+":
+                past: list[tuple[int, int]] = []
+                for p in tl.mps:
+                    past.append((p, tl.mem.get(p, 0)))
+                    tl.mem[p] = (tl.mem.get(p, 0) + 1) % 256
+                tl.history.append(tuple(past))
+            elif op == "-":
+                past: list[tuple[int, int]] = []
+                for p in tl.mps:
+                    past.append((p, tl.mem.get(p, 0)))
+                    tl.mem[p] = (tl.mem.get(p, 0) - 1) % 256
+                tl.history.append(tuple(past))
+            elif op == ".":
+                for p in tl.mps:
+                    tl.parent.output.write((tl.mem.get(p, 0)).to_bytes(1, "little"))
+            elif op == ",":
+                past: list[tuple[int, int]] = []
+                c = (tl.parent.input.read(1) or b"\xFF")[0]
+                for p in tl.mps:
+                    past.append((p, tl.mem.get(p, 0)))
+                    tl.mem[p] = c
+                tl.history.append(tuple(past))
+            elif op == "[":
+                jump = True
+                for p in tl.mps:
+                    if (tl.mem.get(p, 0)):
+                        jump = False
+                if (jump):
+                    count = 1
+                    tl.ip += 1
+                    while count and tl.ip < len(tl.parent.program):
+                        count += bracket1.get(tl.parent.program[tl.ip], 0)
+                        tl.ip += 1
+                    tl.ip -= 1
+            elif op == "]":
+                jump = False
+                for p in tl.mps:
+                    if (tl.mem.get(p, 0)):
+                        jump = True
+                if (jump):
+                    count = -1
+                    tl.ip -= 1
+                    while count and tl.ip >= 0:
+                        count += bracket1.get(tl.parent.program[tl.ip], 0)
+                        tl.ip -= 1
+                    tl.ip += 1
+            tl.ip += 1
+        tl.parent.timelines.remove(tl)
+    except Exception as e:
+        tl.parent.errors.append(e)
