@@ -1,5 +1,6 @@
 import asyncio
 import multiprocessing
+import traceback
 import typing
 
 import interactions
@@ -7,7 +8,6 @@ import numpy as np
 import numpy.typing
 import PIL.Image
 import PIL.ImageColor
-
 
 ColourType = tuple[int, int, int, int]
 
@@ -58,7 +58,7 @@ class PsuedoContext:
 
 
 async def run_in_subprocess(f: ImageEditType, args: tuple) -> list[ImageFrame]:
-    q: multiprocessing.Queue[list[ImageFrame] | Exception] = multiprocessing.Queue()
+    q: multiprocessing.Queue[list[ImageFrame] | tuple[Exception, list[str]]] = multiprocessing.Queue()
 
     p = multiprocessing.Process(target=run_process, args=(f, args, q))
     p.start()
@@ -67,13 +67,19 @@ async def run_in_subprocess(f: ImageEditType, args: tuple) -> list[ImageFrame]:
     if (q.empty()):
         raise RuntimeError(f"subprocess exited with code {p.exitcode} and returned no output")
     res = q.get()
-    if (isinstance(res, Exception)):
-        raise res
-    return res
+    if (type(res) == list):
+        return res
+    elif (type(res) == tuple):
+        e, tb = res
+        print("\n".join(tb))
+        raise e
+    else:
+        raise TypeError(f"{type(res)} is not a list or tuple")
 
 
 def run_process(f: ImageEditType, args: tuple, q: multiprocessing.Queue):
+    q2: multiprocessing.Queue[list[ImageFrame] | tuple[Exception, list[str]]] = q
     try:
-        q.put(f(*args))
+        q2.put(f(*args))
     except Exception as e:
-        q.put(e)
+        q2.put((e, traceback.format_exception(e)))

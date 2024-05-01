@@ -32,8 +32,10 @@ def to_file(imgs: list[util.ImageFrame]) -> tuple[tempfile._TemporaryFileWrapper
         ext = "png"
     else:
         ext = "gif"
+        imgs2 = []
         for img in imgs:
-            img.frame = img.frame.convert("RGB").quantize(method=PIL.Image.Quantize.MAXCOVERAGE)
+            imgs2.append(util.ImageFrame(img.frame.convert("RGB").quantize(method=PIL.Image.Quantize.MAXCOVERAGE), img.duration))
+        imgs = imgs2
     frames = [x.frame for x in imgs]
     durations = [x.duration for x in imgs]
     imgs[0].frame.save(f.file, ext, save_all=True, append_images=frames[1:], loop=0, duration=durations)
