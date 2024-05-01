@@ -1,3 +1,4 @@
+import logging
 import random
 import string
 import typing
@@ -5,6 +6,8 @@ import typing
 import interactions
 
 from . import animated, basic, blur, misc, util
+
+logger = logging.getLogger(__name__)
 
 RandomEditType = tuple[util.ImageEditType, tuple[typing.Callable[[], typing.Any], ...]]
 
@@ -99,4 +102,9 @@ def randomEdits(imgs: list[util.ImageFrame], iterations: int, preset: str, allow
         fun, args = available_edits[e]
         args = [f() for f in args]
         imgs = fun(imgs, *args)
+    return imgs
+
+
+def repeat(imgs: list[util.ImageFrame], edit: util.ImageEditType, args: tuple) -> list[util.ImageFrame]:
+    imgs = edit(imgs, *args)
     return imgs
