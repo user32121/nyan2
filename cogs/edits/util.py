@@ -9,6 +9,7 @@ import numpy.typing
 import PIL.Image
 import PIL.ImageColor
 
+T = typing.TypeVar("T")
 ColourType = tuple[int, int, int, int]
 
 
@@ -50,36 +51,59 @@ def unnormalize_coordinates(coords: np.ndarray, shape: numpy.typing.ArrayLike, s
 class PsuedoContext:
     """A class with a send method. Minimally imitates a SlashContext. For commands where the context expires before it finishes."""
 
-    def __init__(self, msg: interactions.Message) -> None:
-        self.msg = msg
+    def __init__(self, ctx: interactions.Message | interactions.SlashContext) -> None:
+        self.ctx = ctx
 
-    async def send(self, **kwargs) -> None:
-        self.msg = await self.msg.reply(**kwargs)
+    async def send(self, **kwargs) -> interactions.Message:
+        if (isinstance(self.ctx, interactions.SlashContext)):
+            self.ctx = await self.ctx.send(**kwargs)
+        else:
+            self.ctx = await self.ctx.reply(**kwargs)
+        return self.ctx
 
 
-async def run_in_subprocess(f: ImageEditType, args: tuple) -> list[ImageFrame]:
-    q: multiprocessing.Queue[list[ImageFrame] | tuple[Exception, list[str]]] = multiprocessing.Queue()
+class MultiprocessingResult(typing.Generic[T]):
+    def __init__(self, res: T) -> None:
+        self.res = res
 
-    p = multiprocessing.Process(target=run_process, args=(f, args, q))
+
+class MultiprocessingPsuedoContext:
+    """Allows sending basic text so the user knows what is happening"""
+
+    def __init__(self, q: multiprocessing.Queue) -> None:
+        self.q = q
+
+    def send(self, **kwargs) -> None:
+        self.q.put(kwargs)
+
+
+async def run_in_subprocess(ctx: interactions.SlashContext | PsuedoContext, f: typing.Callable[..., T], args: tuple, kwargs: dict[str, typing.Any] = {}) -> T:
+    q: multiprocessing.Queue[MultiprocessingResult[T] | tuple[Exception, list[str]] | dict] = multiprocessing.Queue()
+
+    p = multiprocessing.Process(target=run_process, args=(f, args, kwargs, q))
     p.start()
-    while p.is_alive() and q.empty():
-        await asyncio.sleep(1)
-    if (q.empty()):
-        raise RuntimeError(f"subprocess exited with code {p.exitcode} and returned no output")
-    res = q.get()
-    if (type(res) == list):
-        return res
-    elif (type(res) == tuple):
+    while True:
+        while p.is_alive() and q.empty():
+            await asyncio.sleep(1)
+        if (q.empty()):
+            raise RuntimeError(f"subprocess exited with code {p.exitcode} and returned no output")
+        res = q.get()
+        if (type(res) == dict):
+            await ctx.send(**res)
+        else:
+            break
+    if (type(res) == tuple):
         e, tb = res
         print("\n".join(tb))
         raise e
-    else:
-        raise TypeError(f"{type(res)} is not a list or tuple")
+    elif (type(res) == MultiprocessingResult):
+        return res.res
+    raise TypeError(f"unhandled type {type(res)}")
 
 
-def run_process(f: ImageEditType, args: tuple, q: multiprocessing.Queue):
-    q2: multiprocessing.Queue[list[ImageFrame] | tuple[Exception, list[str]]] = q
+def run_process(f:  typing.Callable[..., T], args: tuple, kwargs: dict[str, typing.Any], q: multiprocessing.Queue):
+    q2: multiprocessing.Queue[MultiprocessingResult[T] | tuple[Exception, list[str]] | dict] = q
     try:
-        q2.put(f(*args))
+        q2.put(MultiprocessingResult(f(MultiprocessingPsuedoContext(q2), *args, **kwargs)))
     except Exception as e:
         q2.put((e, traceback.format_exception(e)))

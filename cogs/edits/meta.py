@@ -84,7 +84,7 @@ presets: dict[str, dict[str, RandomEditType]] = {
 }
 
 
-def randomEdits(imgs: list[util.ImageFrame], iterations: int, preset: str, allow_basic: typing.Optional[bool], allow_blur: typing.Optional[bool], allow_animated: typing.Optional[bool], allow_misc: typing.Optional[bool]) -> list[util.ImageFrame]:
+def randomEdits(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], iterations: int, preset: str, allow_basic: typing.Optional[bool], allow_blur: typing.Optional[bool], allow_animated: typing.Optional[bool], allow_misc: typing.Optional[bool]) -> list[util.ImageFrame]:
     available_edits = presets[preset]
     for c, b in [("basic", allow_basic), ("blur", allow_blur), ("animated", allow_animated), ("misc", allow_misc)]:
         if (b == None):
@@ -101,10 +101,10 @@ def randomEdits(imgs: list[util.ImageFrame], iterations: int, preset: str, allow
         e = random.choice(available_edit_names)
         fun, args = available_edits[e]
         args = [f() for f in args]
-        imgs = fun(imgs, *args)
+        imgs = fun(ctx, imgs, *args)
     return imgs
 
 
-def repeat(imgs: list[util.ImageFrame], edit: util.ImageEditType, args: tuple) -> list[util.ImageFrame]:
-    imgs = edit(imgs, *args)
+def repeat(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], edit: util.ImageEditType, args: tuple) -> list[util.ImageFrame]:
+    imgs = edit(ctx, imgs, *args)
     return imgs

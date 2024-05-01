@@ -9,7 +9,7 @@ from . import image_io, misc, util
 logger = logging.getLogger(__name__)
 
 
-def hueshift(imgs: list[util.ImageFrame], delay: int, frames: int, cycles: float, scale_x: float, scale_y: float) -> list[util.ImageFrame]:
+def hueshift(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], delay: int, frames: int, cycles: float, scale_x: float, scale_y: float) -> list[util.ImageFrame]:
     if (len(imgs) == 1):
         imgs *= frames
         delays = [delay]*frames
@@ -39,7 +39,7 @@ def cubic(t: np.ndarray, ar: np.ndarray) -> np.ndarray:
     return -2 * t**3 * ar + 3 * t**2 * ar
 
 
-def spin(imgs: list[util.ImageFrame], delay: int, frames: int, cycles: float, radius: float, center_x: float, center_y: float) -> list[util.ImageFrame]:
+def spin(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], delay: int, frames: int, cycles: float, radius: float, center_x: float, center_y: float) -> list[util.ImageFrame]:
     if (len(imgs) == 1):
         imgs *= frames
         delays = [delay]*frames
@@ -70,7 +70,7 @@ def spin(imgs: list[util.ImageFrame], delay: int, frames: int, cycles: float, ra
     return imgs
 
 
-def boom(imgs: list[util.ImageFrame], delay: int, frames: int,  amount: float, center_x: float, center_y: float) -> list[util.ImageFrame]:
+def boom(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], delay: int, frames: int,  amount: float, center_x: float, center_y: float) -> list[util.ImageFrame]:
     if (len(imgs) == 1):
         imgs *= frames
         delays = [delay]*frames
@@ -79,7 +79,7 @@ def boom(imgs: list[util.ImageFrame], delay: int, frames: int,  amount: float, c
     amounts = np.linspace(0, amount, len(imgs)+1)
     for i in range(len(imgs)):
         img = util.ImageFrame(imgs[i].frame.copy(), 0)
-        img = misc.bulge([img], amounts[i], center_x, center_y)[0]
+        img = misc.bulge(ctx, [img], amounts[i], center_x, center_y)[0]
         imgs[i] = util.ImageFrame(img.frame, delays[i])
     boom_imgs = image_io.from_file(open(os.path.join("cogs", "images", "boom.gif"), "rb"))
     for i in range(len(boom_imgs)):
@@ -87,7 +87,7 @@ def boom(imgs: list[util.ImageFrame], delay: int, frames: int,  amount: float, c
     return imgs + boom_imgs
 
 
-def squish(imgs: list[util.ImageFrame], delay: int, frames: int,  cycles: float, amount: float) -> list[util.ImageFrame]:
+def squish(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], delay: int, frames: int,  cycles: float, amount: float) -> list[util.ImageFrame]:
     if (len(imgs) == 1):
         imgs *= frames
         delays = [delay]*frames

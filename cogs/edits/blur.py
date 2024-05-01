@@ -7,13 +7,13 @@ import scipy
 from . import util
 
 
-def gaussianblur(imgs: list[util.ImageFrame], radius: float) -> list[util.ImageFrame]:
+def gaussianblur(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], radius: float) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         imgs[i].frame = imgs[i].frame.filter(PIL.ImageFilter.GaussianBlur(radius))
     return imgs
 
 
-def motionblur(imgs: list[util.ImageFrame], length: int, angle: float) -> list[util.ImageFrame]:
+def motionblur(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], length: int, angle: float) -> list[util.ImageFrame]:
     kernel = np.reshape([0, 0, 1, 0, 0], (5, 1))
     kernel = PIL.Image.fromarray(kernel)
     kernel = kernel.resize((length, 5))
@@ -28,7 +28,7 @@ def motionblur(imgs: list[util.ImageFrame], length: int, angle: float) -> list[u
     return imgs
 
 
-def zoomblur(imgs: list[util.ImageFrame], zoom: float, interpolation: int) -> list[util.ImageFrame]:
+def zoomblur(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], zoom: float, interpolation: int) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ars = []
         for z in np.linspace(1, zoom, interpolation):
@@ -40,7 +40,7 @@ def zoomblur(imgs: list[util.ImageFrame], zoom: float, interpolation: int) -> li
     return imgs
 
 
-def circularblur(imgs: list[util.ImageFrame], angle: float, interpolation: int) -> list[util.ImageFrame]:
+def circularblur(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], angle: float, interpolation: int) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ars = []
         for a in np.linspace(-angle/2, angle/2, interpolation):

@@ -9,7 +9,7 @@ from . import util
 logger = logging.getLogger(__name__)
 
 
-def bulge(imgs: list[util.ImageFrame], amount: float, center_x: float, center_y: float) -> list[util.ImageFrame]:
+def bulge(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], amount: float, center_x: float, center_y: float) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         shape = ar.shape[:2]
@@ -28,7 +28,7 @@ def bulge(imgs: list[util.ImageFrame], amount: float, center_x: float, center_y:
     return imgs
 
 
-def snap(imgs: list[util.ImageFrame], steps: float, fuzzy: bool) -> list[util.ImageFrame]:
+def snap(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], steps: float, fuzzy: bool) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         xys = util.unnormalize_coordinates(np.random.random((1000, 2)) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
@@ -47,7 +47,7 @@ def snap(imgs: list[util.ImageFrame], steps: float, fuzzy: bool) -> list[util.Im
     return imgs
 
 
-def magic(imgs: list[util.ImageFrame], steps: float) -> list[util.ImageFrame]:
+def magic(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], steps: float) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         for _ in range(int(np.ceil(steps * imgs[i].frame.width * imgs[i].frame.height / 1000))):
@@ -69,14 +69,16 @@ def estimate_upscale_time(imgs: list[util.ImageFrame]) -> float:
     return total
 
 
-def upscale(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
+def upscale(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
+    expected_time = estimate_upscale_time(imgs)
+    ctx.send(content=f"processing... (approximately {expected_time:.3f}s)")
     upscale_model = torch.hub.load("nagadomi/nunif:master", "waifu2x", method="scale", noise_level=3)  # , trust_repo=False)
     for img in imgs:
         img.frame = upscale_model.infer(img.frame)
     return imgs
 
 
-def downscale(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
+def downscale(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
     for img in imgs:
         img.frame = img.frame.resize((img.frame.width // 2, img.frame.height // 2))
     return imgs

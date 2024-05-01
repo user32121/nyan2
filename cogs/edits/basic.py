@@ -12,7 +12,7 @@ from . import util
 logger = logging.getLogger(__name__)
 
 
-def add_caption(imgs: list[util.ImageFrame], text: str, relative_font_size: float = 1) -> list[util.ImageFrame]:
+def add_caption(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], text: str, relative_font_size: float = 1) -> list[util.ImageFrame]:
     text = text.replace(r"\\", chr(0))
     text = text.replace(r"\,", chr(1))
     text = text.replace(r"\n", chr(2))
@@ -37,7 +37,7 @@ def add_caption(imgs: list[util.ImageFrame], text: str, relative_font_size: floa
     return imgs
 
 
-def multiply(imgs: list[util.ImageFrame], color: util.ColourType) -> list[util.ImageFrame]:
+def multiply(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], color: util.ColourType) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         ar = (ar * color / 255).astype(ar.dtype)
@@ -45,7 +45,7 @@ def multiply(imgs: list[util.ImageFrame], color: util.ColourType) -> list[util.I
     return imgs
 
 
-def hsv_hue(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
+def hsv_hue(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("HSV"))
         ar[np.expand_dims(((ar[:, :, 0:2] != 0).any(axis=2)), axis=2) & [[[False, True, True]]]] = 255
@@ -53,7 +53,7 @@ def hsv_hue(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
     return imgs
 
 
-def hsv_saturation(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
+def hsv_saturation(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("HSV"))
         ar[:, :, 0] = ar[:, :, 1]
@@ -62,7 +62,7 @@ def hsv_saturation(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
     return imgs
 
 
-def hsv_value(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
+def hsv_value(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("HSV"))
         ar[:, :, 0] = ar[:, :, 2]
@@ -71,7 +71,7 @@ def hsv_value(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
     return imgs
 
 
-def invert(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
+def invert(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         ar[:, :, :3] = 255 - ar[:, :, :3]
@@ -79,7 +79,7 @@ def invert(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
     return imgs
 
 
-def tint(imgs: list[util.ImageFrame], colour: util.ColourType) -> list[util.ImageFrame]:
+def tint(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], colour: util.ColourType) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         ar = ((ar + colour) / 2).astype(ar.dtype)
@@ -87,7 +87,7 @@ def tint(imgs: list[util.ImageFrame], colour: util.ColourType) -> list[util.Imag
     return imgs
 
 
-def grid(imgs: list[util.ImageFrame], thickness: int, colour: util.ColourType) -> list[util.ImageFrame]:
+def grid(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], thickness: int, colour: util.ColourType) -> list[util.ImageFrame]:
     t = thickness
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
