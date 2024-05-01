@@ -375,7 +375,7 @@ class Edit(interactions.Extension):
                      ) -> None:
         await util.preprocess(ctx)
         if (self.last_img == None):
-            raise interactions.errors.BadArgument("no edit has been run since startup")
+            raise interactions.errors.CommandException("no edit has been run since startup")
         img = await edit_util.run_in_subprocess(ctx, meta.repeat, (self.last_img, self.last_edit, self.last_args))
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img = img

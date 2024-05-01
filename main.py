@@ -21,7 +21,7 @@ async def on_command_error(event: interactions.events.CommandError):
     err = event.error
     if isinstance(err, interactions.errors.Forbidden):
         await ctx.send("bot is missing permissions")
-    elif isinstance(err, interactions.errors.BadArgument):
+    elif isinstance(err, interactions.errors.BadArgument) or isinstance(err, interactions.errors.CommandException):
         await ctx.send(f"error: {err}")
     elif isinstance(err, util.PreprocessingError):
         await ctx.send(str(err))
