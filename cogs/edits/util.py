@@ -6,12 +6,30 @@ import interactions
 import numpy as np
 import numpy.typing
 import PIL.Image
+import PIL.ImageColor
+
+
+ColourType = tuple[int, int, int, int]
+
+
+class ColourConverter(interactions.Converter):
+    async def convert(self, ctx: interactions.SlashContext, arg: str) -> ColourType:
+        try:
+            res = PIL.ImageColor.getrgb(arg)
+        except ValueError as e:
+            raise interactions.errors.BadArgument(str(e))
+        if (len(res) == 3):
+            return (*res, 255)
+        return res
 
 
 class ImageFrame:
     def __init__(self, frame: PIL.Image.Image, duration: int) -> None:
         self.frame = frame
         self.duration = duration
+
+
+ImageEditType = typing.Callable[..., list[ImageFrame]]
 
 
 def normalize_coordinates(coords: np.ndarray, shape: numpy.typing.ArrayLike, square=True) -> np.ndarray:
@@ -39,7 +57,7 @@ class PsuedoContext:
         self.msg = await self.msg.reply(**kwargs)
 
 
-async def run_in_subprocess(f: typing.Callable[..., list[ImageFrame]], args: tuple) -> list[ImageFrame]:
+async def run_in_subprocess(f: ImageEditType, args: tuple) -> list[ImageFrame]:
     q: multiprocessing.Queue[list[ImageFrame] | Exception] = multiprocessing.Queue()
 
     p = multiprocessing.Process(target=run_process, args=(f, args, q))
@@ -54,7 +72,7 @@ async def run_in_subprocess(f: typing.Callable[..., list[ImageFrame]], args: tup
     return res
 
 
-def run_process(f: typing.Callable[..., list[ImageFrame]], args: tuple, q: multiprocessing.Queue):
+def run_process(f: ImageEditType, args: tuple, q: multiprocessing.Queue):
     try:
         q.put(f(*args))
     except Exception as e:

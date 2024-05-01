@@ -5,7 +5,7 @@ import interactions
 
 import util
 
-from .edits import animated, basic, blur, image_io, misc
+from .edits import animated, basic, blur, image_io, meta, misc
 from .edits import util as edit_util
 
 logger = logging.getLogger(__name__)
@@ -15,6 +15,7 @@ basic_group = base_command.group("basic", "simple edits")
 blur_group = base_command.group("blur", "various blur effects")
 animated_group = base_command.group("animated", "effects that make gifs")
 misc_group = base_command.group("misc", "miscellaneous effects")
+meta_group = base_command.group("meta", "edits that use other edits")
 
 
 def slash_colour_option(required):
@@ -22,8 +23,8 @@ def slash_colour_option(required):
 
 
 file_option = typing.Annotated[interactions.Attachment, interactions.slash_attachment_option("the image to edit", True)]
-required_colour_option = typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, slash_colour_option(required=True)]
-colour_option = typing.Annotated[tuple[int, int, int, int], basic.ColourConverter, slash_colour_option(required=False)]
+required_colour_option = typing.Annotated[edit_util.ColourType, edit_util.ColourConverter, slash_colour_option(required=True)]
+colour_option = typing.Annotated[edit_util.ColourType, edit_util.ColourConverter, slash_colour_option(required=False)]
 
 
 class Edit(interactions.Extension):
@@ -298,14 +299,22 @@ class Edit(interactions.Extension):
         img = await edit_util.run_in_subprocess(misc.downscale, (img,))
         await image_io.send_file(ctx, img)
 
-    @misc_group.subcommand(sub_cmd_name="random", sub_cmd_description="not implemented")
+    @meta_group.subcommand(sub_cmd_name="random", sub_cmd_description="perform random edits")
     async def random(self, ctx: interactions.SlashContext,
                      file: file_option,
+                     iterations: typing.Annotated[int, interactions.slash_int_option("number of times to use another command", min_value=0)] = 3,
+                     preset: typing.Annotated[str, interactions.slash_str_option("presets containing which edits are allowed", choices=util.as_choices(["all", "default", "no_basic", "no_basic, no_blur", "none"]))] = "default",
+                     allow_basic: typing.Annotated[typing.Optional[bool], interactions.slash_bool_option("whether to allow basic edits")] = None,
+                     allow_blur: typing.Annotated[typing.Optional[bool], interactions.slash_bool_option("whether to allow blur edits")] = None,
+                     allow_animated: typing.Annotated[typing.Optional[bool], interactions.slash_bool_option("whether to allow animated edits")] = None,
+                     allow_misc: typing.Annotated[typing.Optional[bool], interactions.slash_bool_option("whether to allow misc edits")] = None,
                      ) -> None:
-        # TODO
-        await util.not_implemented(ctx)
+        await util.preprocess(ctx)
+        img = image_io.from_url(file.proxy_url)
+        img = await edit_util.run_in_subprocess(meta.randomEdits, (img, iterations, preset, allow_basic, allow_blur, allow_animated, allow_misc))
+        await image_io.send_file(ctx, img)
 
-    @misc_group.subcommand(sub_cmd_name="repeat", sub_cmd_description="not implemented")
+    @meta_group.subcommand(sub_cmd_name="repeat", sub_cmd_description="not implemented")
     async def repeat(self, ctx: interactions.SlashContext,
                      file: file_option,
                      ) -> None:

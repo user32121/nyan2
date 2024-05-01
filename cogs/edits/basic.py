@@ -37,23 +37,12 @@ def add_caption(imgs: list[util.ImageFrame], text: str, relative_font_size: floa
     return imgs
 
 
-def multiply(imgs: list[util.ImageFrame], color: tuple[int, int, int, int]) -> list[util.ImageFrame]:
+def multiply(imgs: list[util.ImageFrame], color: util.ColourType) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         ar = (ar * color / 255).astype(ar.dtype)
         imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
     return imgs
-
-
-class ColourConverter(interactions.Converter):
-    async def convert(self, ctx: interactions.SlashContext, arg: str) -> tuple[int, int, int, int]:
-        try:
-            res = PIL.ImageColor.getrgb(arg)
-        except ValueError as e:
-            raise interactions.errors.BadArgument(str(e))
-        if (len(res) == 3):
-            return (*res, 255)
-        return res
 
 
 def hsv_hue(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
@@ -90,7 +79,7 @@ def invert(imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
     return imgs
 
 
-def tint(imgs: list[util.ImageFrame], colour: tuple[int, int, int, int]) -> list[util.ImageFrame]:
+def tint(imgs: list[util.ImageFrame], colour: util.ColourType) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         ar = ((ar + colour) / 2).astype(ar.dtype)
@@ -98,7 +87,7 @@ def tint(imgs: list[util.ImageFrame], colour: tuple[int, int, int, int]) -> list
     return imgs
 
 
-def grid(imgs: list[util.ImageFrame], thickness: int, colour: tuple[int, int, int, int]) -> list[util.ImageFrame]:
+def grid(imgs: list[util.ImageFrame], thickness: int, colour: util.ColourType) -> list[util.ImageFrame]:
     t = thickness
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
