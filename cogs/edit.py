@@ -156,7 +156,7 @@ class Edit(interactions.Extension):
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        args = (caption,)
+        args = (caption, font_size)
         img = await edit_util.run_in_subprocess(basic.add_caption, (img, *args))
         await image_io.send_file(ctx, img)
         self.last_img, self.last_edit, self.last_args = img, basic.add_caption, args
