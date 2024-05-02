@@ -171,5 +171,7 @@ def run_timeline(tl: Timeline) -> None:
         tl.state.timelines.remove(tl)
         if main:
             tl.state.stop = True
+        if (tl.mp_lock.locked()):
+            tl.mp_lock.release()
     except Exception as e:
         tl.state.errors.append(e)
