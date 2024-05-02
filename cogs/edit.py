@@ -291,6 +291,20 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, animated.squish, args, {}
 
+    @animated_group.subcommand(sub_cmd_name="ash", sub_cmd_description="make images turn to ashes")
+    async def ash(self, ctx: interactions.SlashContext,
+                  file: file_option,
+                  delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
+                  frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 50,
+                  time_steps: typing.Annotated[float, interactions.slash_float_option("units of time to simulate")] = 3,
+                  ) -> None:
+        await util.preprocess(ctx)
+        img = image_io.from_url(file.proxy_url)
+        args = (delay, frames, time_steps)
+        img = await edit_util.run_in_subprocess(ctx, animated.ash, (img, *args))
+        await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
+        self.last_img, self.last_edit, self.last_args, self.last_send_args = img, animated.ash, args, {}
+
     @misc_group.subcommand(sub_cmd_name="snap", sub_cmd_description="swap pixels around")
     async def snap(self, ctx: interactions.SlashContext,
                    file: file_option,
@@ -352,14 +366,6 @@ class Edit(interactions.Extension):
         img = await edit_util.run_in_subprocess(ctx, misc.downscale, (img, *args))
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, misc.downscale, args, {}
-
-    @misc_group.subcommand(sub_cmd_name="ash", sub_cmd_description="not implemented, make images turn to ashes")
-    async def ash(self, ctx: interactions.SlashContext,
-                  file: file_option,
-                  ) -> None:
-        await util.preprocess(ctx)
-        # TODO
-        await util.not_implemented(ctx)
 
     @meta_group.subcommand(sub_cmd_name="random", sub_cmd_description="perform random edits")
     async def random(self, ctx: interactions.SlashContext,
