@@ -24,7 +24,7 @@ class React(interactions.Extension):
         e = await util.get_emoji(ctx, emoji)
 
         await message.add_reaction(e)
-        await ctx.send("reacted", ephemeral=True)
+        await ctx.send("reacted")
 
     @ react.autocomplete("emoji")
     async def get_emojis(self, ctx: interactions.AutocompleteContext):
