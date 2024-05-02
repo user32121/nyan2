@@ -382,16 +382,17 @@ class Edit(interactions.Extension):
     async def repeat(self, ctx: interactions.SlashContext,
                      ) -> None:
         await util.preprocess(ctx)
-        if (self.last_img == None):
+        if (self.last_img == None or self.last_send_args == None):
             raise interactions.errors.BadArgument("no edit has been run since startup")
         ctx2 = edit_util.PsuedoContext(ctx)
         img = await edit_util.run_in_subprocess(ctx2, meta.repeat, (self.last_img, self.last_edit, self.last_args))
-        await edit_util.run_in_subprocess(ctx2, image_io.send_file, (img,))
+        await edit_util.run_in_subprocess(ctx2, image_io.send_file, (img,), self.last_send_args)
         self.last_img = img
 
     @meta_group.subcommand(sub_cmd_name="repost", sub_cmd_description="send the output of the last edit")
     async def repost(self, ctx: interactions.SlashContext
                      ) -> None:
         await util.preprocess(ctx)
-        # TODO
-        await util.not_implemented(ctx)
+        if (self.last_img == None or self.last_send_args == None):
+            raise interactions.errors.BadArgument("no edit has been run since startup")
+        await edit_util.run_in_subprocess(ctx, image_io.send_file, (self.last_img,), self.last_send_args)
