@@ -125,13 +125,13 @@ def run_timeline(tl: Timeline) -> None:
                         count += bracket1.get(tl.state.program[tl.ip], 0)
             elif op == "~":
                 if (len(tl.history) == 0):
-                    raise interactions.errors.CommandException("no history to rewind")
+                    raise interactions.errors.BadArgument("no history to rewind")
                 step = tl.history.pop()
                 for p, c in step:
                     tl.mem[p] = c
             elif op == "(":
                 if (len(tl.state.timelines) >= 10):
-                    raise interactions.errors.CommandException("exceeded max (10) timelines")
+                    raise interactions.errors.BadArgument("exceeded max (10) timelines")
                 new_tl = Timeline(tl.state, tl.ip + 1, tl.mps.copy(), tl.mem.copy())
                 tl.state.timelines.append(new_tl)
                 start_timeline(new_tl)
