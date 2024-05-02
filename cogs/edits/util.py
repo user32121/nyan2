@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import multiprocessing
 import traceback
 import typing
@@ -8,6 +9,8 @@ import numpy as np
 import numpy.typing
 import PIL.Image
 import PIL.ImageColor
+
+logger = logging.getLogger(__name__)
 
 T = typing.TypeVar("T")
 ColourType = tuple[int, int, int, int]

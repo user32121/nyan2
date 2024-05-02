@@ -339,7 +339,7 @@ class Edit(interactions.Extension):
         img = image_io.from_url(file.proxy_url)
         args = ()
         img = await edit_util.run_in_subprocess(ctx2, misc.upscale, (img, *args))
-        await edit_util.run_in_subprocess(ctx, image_io.send_file, (img, False))
+        await edit_util.run_in_subprocess(ctx2, image_io.send_file, (img, False))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, misc.upscale, args, {"allow_downscaling": False}
 
     @misc_group.subcommand(sub_cmd_name="downscale", sub_cmd_description="half the image size")
@@ -352,6 +352,14 @@ class Edit(interactions.Extension):
         img = await edit_util.run_in_subprocess(ctx, misc.downscale, (img, *args))
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, misc.downscale, args, {}
+
+    @misc_group.subcommand(sub_cmd_name="ash", sub_cmd_description="not implemented, make images turn to ashes")
+    async def ash(self, ctx: interactions.SlashContext,
+                  file: file_option,
+                  ) -> None:
+        await util.preprocess(ctx)
+        # TODO
+        await util.not_implemented(ctx)
 
     @meta_group.subcommand(sub_cmd_name="random", sub_cmd_description="perform random edits")
     async def random(self, ctx: interactions.SlashContext,
@@ -376,6 +384,14 @@ class Edit(interactions.Extension):
         await util.preprocess(ctx)
         if (self.last_img == None):
             raise interactions.errors.CommandException("no edit has been run since startup")
-        img = await edit_util.run_in_subprocess(ctx, meta.repeat, (self.last_img, self.last_edit, self.last_args))
-        await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
+        ctx2 = edit_util.PsuedoContext(ctx)
+        img = await edit_util.run_in_subprocess(ctx2, meta.repeat, (self.last_img, self.last_edit, self.last_args))
+        await edit_util.run_in_subprocess(ctx2, image_io.send_file, (img,))
         self.last_img = img
+
+    @meta_group.subcommand(sub_cmd_name="repost", sub_cmd_description="send the output of the last edit")
+    async def repost(self, ctx: interactions.SlashContext
+                     ) -> None:
+        await util.preprocess(ctx)
+        # TODO
+        await util.not_implemented(ctx)
