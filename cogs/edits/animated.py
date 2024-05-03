@@ -108,7 +108,7 @@ def gradient(xys: np.ndarray, t: float) -> np.ndarray:
     return 2 * xys[:, 0] + xys[:, 1] + t * 3
 
 
-def ash(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], delay: int, frames: int, time_steps: int) -> list[util.ImageFrame]:
+def ash(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], delay: int, frames: int, time_steps: float, spread_delay: float, spread_amount: float, gravity_x: float, gravity_y: float) -> list[util.ImageFrame]:
     if (len(imgs) == 1):
         imgs *= frames
         delays = [delay]*frames
@@ -123,13 +123,13 @@ def ash(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], del
         xys = list(np.ndindex(shape))
         xys = np.reshape(xys, (*shape, 2))
         if (init_vel is None):
-            init_vel = np.random.normal(0, 0.2, (*shape[:2], 4, 2))
+            init_vel = np.random.normal(0, spread_amount, (*shape[:2], 4, 2))
         mask = (ar < 240).any(axis=2)
         xys = xys[mask]
         xys = np.repeat(xys, 4, axis=0)
         xys = util.normalize_coordinates(xys, shape)
-        grad1 = np.expand_dims(np.maximum(gradient(xys, ts[i] - 1.2), 0), 1) / 3
-        grav_vel = np.array([-0.5, 0]) * grad1
+        grad1 = np.expand_dims(np.maximum(gradient(xys, ts[i] - 1 - spread_delay), 0), 1) / 3
+        grav_vel = np.array([gravity_y, gravity_x]) * grad1
         xys2 = xys + np.reshape(init_vel[mask], (-1, 2)) * grad1 + grav_vel * grad1
         xys2 = np.round(util.unnormalize_coordinates(xys2, shape)).astype(int)
         xys2 = np.clip(xys2, 0, np.array(shape) - 1)

@@ -297,10 +297,14 @@ class Edit(interactions.Extension):
                   delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
                   frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 50,
                   time_steps: typing.Annotated[float, interactions.slash_float_option("units of time to simulate")] = 3,
+                  spread_delay: typing.Annotated[float, interactions.slash_float_option("units of time between changing colour and moving")] = 0.2,
+                  spread_amount: typing.Annotated[float, interactions.slash_float_option("how much pixels spread out", min_value=0)] = 0.2,
+                  gravity_x: typing.Annotated[float, interactions.slash_float_option("direction the pixels accelerate")] = 0,
+                  gravity_y: typing.Annotated[float, interactions.slash_float_option("direction the pixels accelerate")] = -0.5,
                   ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        args = (delay, frames, time_steps)
+        args = (delay, frames, time_steps, spread_delay, spread_amount, gravity_x, gravity_y)
         img = await edit_util.run_in_subprocess(ctx, animated.ash, (img, *args))
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, animated.ash, args, {}
