@@ -62,6 +62,7 @@ animated_edits: dict[str, RandomEditType] = {
     "rainbow": (animated.hueshift, (constantGenerator(100), constantGenerator(18), constantGenerator(1), floatGenerator(0, 2), floatGenerator(0, 2))),
     "spin": (animated.spin, (constantGenerator(50), constantGenerator(5), constantGenerator(1), floatGenerator(0, 1), floatGenerator(-1, 1), floatGenerator(-1, 1))),
     "squish": (animated.squish, (constantGenerator(100), constantGenerator(5), constantGenerator(1), floatGenerator(0, 2))),
+    "ash": (animated.ash, (constantGenerator(50), constantGenerator(50), constantGenerator(3), floatGenerator(0, 0.5), floatGenerator(0, 1), floatGenerator(-1, 1), floatGenerator(-1, 1))),
 }
 misc_edits: dict[str, RandomEditType] = {
     "snap": (misc.snap, (floatGenerator(0, 5), boolGenerator)),
