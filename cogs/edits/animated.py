@@ -128,7 +128,7 @@ def ash(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], del
         xys = xys[mask]
         xys = np.repeat(xys, 4, axis=0)
         xys = util.normalize_coordinates(xys, shape)
-        grad1 = np.expand_dims(np.maximum(gradient(xys, ts[i] - 1.5), 0), 1) / 3
+        grad1 = np.expand_dims(np.maximum(gradient(xys, ts[i] - 1.2), 0), 1) / 3
         grav_vel = np.array([-0.5, 0]) * grad1
         xys2 = xys + np.reshape(init_vel[mask], (-1, 2)) * grad1 + grav_vel * grad1
         xys2 = np.round(util.unnormalize_coordinates(xys2, shape)).astype(int)
