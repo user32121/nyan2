@@ -12,16 +12,15 @@ logger = logging.getLogger(__name__)
 def bulge(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], amount: float, center_x: float, center_y: float) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
-        shape = ar.shape[:2]
+        shape = (ar.shape[0], ar.shape[1])
+        center = (center_y, center_x)
         xys = list(np.ndindex(shape))
         xys = np.reshape(xys, (*shape, 2))
-        xys = util.normalize_coordinates(xys, shape)
-        xys = xys - [center_y, center_x]
+        xys = util.normalize_coordinates(xys, shape, center)
         dists = np.linalg.norm(xys, axis=2)
         dists = np.minimum(dists, 1)
         xys *= np.expand_dims(dists ** ((2 ** amount) - 1), axis=2)
-        xys = xys + [center_y, center_x]
-        xys = util.unnormalize_coordinates(xys, shape).astype(int)
+        xys = util.unnormalize_coordinates(xys, shape, center).astype(int)
         xys = np.clip(xys, 0, np.array(shape)-1)
         ar = ar[xys[:, :, 0], xys[:, :, 1]]
         imgs[i].frame = PIL.Image.fromarray(ar, "RGBA")
@@ -31,7 +30,7 @@ def bulge(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], a
 def snap(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], steps: float, fuzzy: bool) -> list[util.ImageFrame]:
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
-        xys = util.unnormalize_coordinates(np.random.random((1000, 2)) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
+        xys = np.transpose([np.random.randint(0, ar.shape[0] - 1, 1000), np.random.randint(0, ar.shape[1] - 1, 1000)])
         for _ in range(int(np.ceil(steps * imgs[i].frame.width * imgs[i].frame.height / 1000))):
             ps = ar[xys[:, 0], xys[:, 1]]
             dirs = np.random.randint(0, 3, size=1000)
@@ -51,7 +50,7 @@ def magic(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], s
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
         for _ in range(int(np.ceil(steps * imgs[i].frame.width * imgs[i].frame.height / 1000))):
-            xys = util.unnormalize_coordinates(np.random.random((1000, 2)) * 2 - 1, ar.shape[:2] - np.array([1, 1]), False).astype(int)
+            xys = np.transpose([np.random.randint(0, ar.shape[0] - 1, 1000), np.random.randint(0, ar.shape[1] - 1, 1000)])
             xys2 = xys + [[[0, 1]], [[1, 0]], [[0, -1]], [[-1, 0]]]
             xys2 = xys2 % ar.shape[:2]
             ar[xys2[:, :, 0], xys2[:, :, 1]] = ar[xys[:, 0], xys[:, 1]]

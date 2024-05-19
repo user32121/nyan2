@@ -267,7 +267,7 @@ class Edit(interactions.Extension):
                    delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
                    frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 5,
                    cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
-                   radius: typing.Annotated[float, interactions.slash_float_option("strength of the offset, normalized")] = 0.5,
+                   radius: typing.Annotated[float, interactions.slash_float_option("strength of the offset, in normalized units")] = 0.5,
                    center_x: coord_x_option = 0.5,
                    center_y: coord_y_option = 0.5,
                    ) -> None:

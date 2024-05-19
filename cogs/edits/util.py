@@ -29,12 +29,9 @@ class ColourConverter(interactions.Converter):
 
 def makeCoordConverter(invert=False):
     class CoordConverter(interactions.Converter):
-        """converts coordinates in [0,1] to [-1,1]"""
-
         async def convert(self, ctx: interactions.SlashContext, arg: float) -> float:
-            arg = arg * 2 - 1
             if (invert):
-                arg *= -1
+                arg = 1 - arg
             return arg
     return CoordConverter
 
@@ -48,18 +45,27 @@ class ImageFrame:
 ImageEditType = typing.Callable[..., list[ImageFrame]]
 
 
-def normalize_coordinates(coords: np.ndarray, shape: numpy.typing.ArrayLike, square=True) -> np.ndarray:
-    # convert integer coordinates to [-1,1] range
-    centerd = coords - np.array(shape) / 2
+def normalize_coordinates(coords: np.ndarray, shape: tuple[int, int], center: tuple[float, float], square=True) -> np.ndarray:
+    """
+    convert integer coordinates ([0,shape]) to normalized coordinates (typically [-1,1] but with a shifted center)
+    
+    args:
+        coords: the coordinates the normalize
+        shape: the maximum range of coords
+        center: where the origin should be (in [0,1])
+        square: whether to preserve the aspect ratio
+    """
+    centered = coords - np.array(shape) * center
     m = np.min(shape) if square else np.array(shape)
-    scaled = centerd / m * 2
+    scaled = centered / m * 2
     return scaled
 
 
-def unnormalize_coordinates(coords: np.ndarray, shape: numpy.typing.ArrayLike, square=True) -> np.ndarray:
+def unnormalize_coordinates(coords: np.ndarray, shape: tuple[int, int], center: tuple[float, float], square=True) -> np.ndarray:
+    """convert normalized coordinates to integer coordinates"""
     m = np.min(shape) if square else np.array(shape)
     centered = coords * m / 2
-    unnormalized = centered + np.array(shape) / 2
+    unnormalized = centered + np.array(shape) * center
     return unnormalized
 
 

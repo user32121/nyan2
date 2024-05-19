@@ -30,8 +30,8 @@ def hueshift(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame]
     return imgs
 
 
-def centered_score(x: np.ndarray, center: float) -> np.ndarray:
-    return np.maximum(1 - np.abs(x-center), 0)
+def centered_score(x: np.ndarray) -> np.ndarray:
+    return np.maximum(1 - np.abs(x), 0)
 
 
 def cubic(t: np.ndarray, ar: np.ndarray) -> np.ndarray:
@@ -50,13 +50,14 @@ def spin(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], de
         ar = np.array(imgs[i].frame.convert("RGBA"))
 
         offset = radius*np.array([np.cos(thetas[i]), np.sin(thetas[i])])
-        shape = ar.shape[:2]
+        shape = (ar.shape[0], ar.shape[1])
+        center = (center_y, center_x)
         xys = list(np.ndindex(shape))
         xys = np.reshape(xys, (*shape, 2))
-        xys = util.normalize_coordinates(xys, shape)
-        xys = xys + cubic(centered_score(xys[:, :, :1], center_y), cubic(centered_score(xys[:, :, 1:], center_x), offset.reshape((1, 1, 2))))
+        xys = util.normalize_coordinates(xys, shape, center)
+        xys = xys + cubic(centered_score(xys[:, :, :1]), cubic(centered_score(xys[:, :, 1:]), offset.reshape((1, 1, 2))))
         # optimize by precomputing TBLR
-        xys_unnorm = util.unnormalize_coordinates(xys, shape)
+        xys_unnorm = util.unnormalize_coordinates(xys, shape, center)
         Ts = np.minimum(xys_unnorm[:-1, :-1, 0], xys_unnorm[:-1, 1:, 0]).astype(int)
         Bs = np.maximum(xys_unnorm[1:, :-1, 0], xys_unnorm[1:, 1:, 0]).astype(int)
         Ls = np.minimum(xys_unnorm[:-1, :-1, 1], xys_unnorm[1:, :-1, 1]).astype(int)
@@ -119,7 +120,7 @@ def ash(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], del
     ts = np.linspace(0, time_steps, len(imgs)+1)
     for i in range(len(imgs)):
         ar = np.array(imgs[i].frame.convert("RGBA"))
-        shape = ar.shape[:2]
+        shape = (ar.shape[0], ar.shape[1])
         xys = list(np.ndindex(shape))
         xys = np.reshape(xys, (*shape, 2))
         if (init_vel is None):
@@ -127,11 +128,11 @@ def ash(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], del
         mask = (ar < 240).any(axis=2)
         xys = xys[mask]
         xys = np.repeat(xys, 4, axis=0)
-        xys = util.normalize_coordinates(xys, shape)
+        xys = util.normalize_coordinates(xys, shape, (0.5, 0.5))
         grad1 = np.expand_dims(np.maximum(gradient(xys, ts[i] - 1 - spread_delay), 0), 1) / 3
         grav_vel = np.array([gravity_y, gravity_x]) * grad1
         xys2 = xys + np.reshape(init_vel[mask], (-1, 2)) * grad1 + grav_vel * grad1
-        xys2 = np.round(util.unnormalize_coordinates(xys2, shape)).astype(int)
+        xys2 = np.round(util.unnormalize_coordinates(xys2, shape, (0.5, 0.5))).astype(int)
         xys2 = np.clip(xys2, 0, np.array(shape) - 1)
         ar2 = np.full_like(ar, 255)
         grad2 = np.expand_dims(np.clip(gradient(xys, ts[i] - 1), 0, 1), 1) * 0.9
