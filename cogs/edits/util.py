@@ -27,6 +27,18 @@ class ColourConverter(interactions.Converter):
         return res
 
 
+class CoordConverter(interactions.Converter):
+    """converts coordinates in [-1,1] to [0,1]"""
+
+    async def __init__(self, invert=False) -> None:
+        self.invert = invert
+
+    async def convert(self, ctx: interactions.SlashContext, arg: float) -> float:
+        if (self.invert):
+            arg *= -1
+        return (arg + 1) / 2
+
+
 class ImageFrame:
     def __init__(self, frame: PIL.Image.Image, duration: int) -> None:
         self.frame = frame
