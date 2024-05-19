@@ -29,12 +29,13 @@ class ColourConverter(interactions.Converter):
 
 def makeCoordConverter(invert=False):
     class CoordConverter(interactions.Converter):
-        """converts coordinates in [-1,1] to [0,1]"""
+        """converts coordinates in [0,1] to [-1,1]"""
 
         async def convert(self, ctx: interactions.SlashContext, arg: float) -> float:
+            arg = arg * 2 - 1
             if (invert):
                 arg *= -1
-            return (arg + 1) / 2
+            return arg
     return CoordConverter
 
 

@@ -221,8 +221,8 @@ class Edit(interactions.Extension):
                    delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
                    frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 10,
                    amount: typing.Annotated[float, interactions.slash_float_option("strength")] = 2,
-                   center_x: coord_x_option = 0,
-                   center_y: coord_y_option = 0,
+                   center_x: coord_x_option = 0.5,
+                   center_y: coord_y_option = 0.5,
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
@@ -268,8 +268,8 @@ class Edit(interactions.Extension):
                    frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 5,
                    cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
                    radius: typing.Annotated[float, interactions.slash_float_option("strength of the offset, normalized")] = 0.5,
-                   center_x: coord_x_option = 0,
-                   center_y: coord_y_option = 0,
+                   center_x: coord_x_option = 0.5,
+                   center_y: coord_y_option = 0.5,
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
@@ -340,8 +340,8 @@ class Edit(interactions.Extension):
     async def bulge(self, ctx: interactions.SlashContext,
                     file: file_option,
                     amount: typing.Annotated[float, interactions.slash_float_option("strength")] = 1,
-                    center_x: coord_x_option = 0,
-                    center_y: coord_y_option = 0,
+                    center_x: coord_x_option = 0.5,
+                    center_y: coord_y_option = 0.5,
                     ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
