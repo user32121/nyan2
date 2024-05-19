@@ -74,6 +74,7 @@ categories: dict[str, dict[str, RandomEditType]] = {
     "blur": blur_edits,
     "animated": animated_edits,
     "misc": misc_edits,
+    "text": {"text": basic_edits["text"]},
 }
 # presets
 presets: dict[str, dict[str, RandomEditType]] = {
@@ -85,9 +86,9 @@ presets: dict[str, dict[str, RandomEditType]] = {
 }
 
 
-def randomEdits(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], iterations: int, preset: str, allow_basic: typing.Optional[bool], allow_blur: typing.Optional[bool], allow_animated: typing.Optional[bool], allow_misc: typing.Optional[bool]) -> list[util.ImageFrame]:
+def randomEdits(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], iterations: int, preset: str, allow_basic: typing.Optional[bool], allow_blur: typing.Optional[bool], allow_animated: typing.Optional[bool], allow_misc: typing.Optional[bool], allow_text: typing.Optional[bool]) -> list[util.ImageFrame]:
     available_edits = presets[preset]
-    for c, b in [("basic", allow_basic), ("blur", allow_blur), ("animated", allow_animated), ("misc", allow_misc)]:
+    for c, b in [("basic", allow_basic), ("blur", allow_blur), ("animated", allow_animated), ("misc", allow_misc), ("text", allow_text)]:
         if (b == None):
             continue
         for e in categories[c]:

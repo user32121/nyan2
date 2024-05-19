@@ -380,10 +380,11 @@ class Edit(interactions.Extension):
                      allow_blur: typing.Annotated[typing.Optional[bool], interactions.slash_bool_option("whether to allow blur edits")] = None,
                      allow_animated: typing.Annotated[typing.Optional[bool], interactions.slash_bool_option("whether to allow animated edits")] = None,
                      allow_misc: typing.Annotated[typing.Optional[bool], interactions.slash_bool_option("whether to allow misc edits")] = None,
+                     allow_text: typing.Annotated[typing.Optional[bool], interactions.slash_bool_option("whether to allow text")] = None,
                      ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
-        args = (iterations, preset, allow_basic, allow_blur, allow_animated, allow_misc)
+        args = (iterations, preset, allow_basic, allow_blur, allow_animated, allow_misc, allow_text)
         img = await edit_util.run_in_subprocess(ctx, meta.randomEdits, (img, *args))
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, meta.randomEdits, args, {}
