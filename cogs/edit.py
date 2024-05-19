@@ -25,8 +25,8 @@ def slash_colour_option(required):
 file_option = typing.Annotated[interactions.Attachment, interactions.slash_attachment_option("the image to edit", True)]
 required_colour_option = typing.Annotated[edit_util.ColourType, edit_util.ColourConverter, slash_colour_option(required=True)]
 colour_option = typing.Annotated[edit_util.ColourType, edit_util.ColourConverter, slash_colour_option(required=False)]
-coord_x_option = typing.Annotated[float, edit_util.CoordConverter(False), interactions.slash_float_option("in the range [0, 1], positive is rightward")]
-coord_y_option = typing.Annotated[float, edit_util.CoordConverter(True), interactions.slash_float_option("in the range [0, 1], positive is upward")]
+coord_x_option = typing.Annotated[float, edit_util.makeCoordConverter(False), interactions.slash_float_option("in the range [0, 1], positive is rightward")]
+coord_y_option = typing.Annotated[float, edit_util.makeCoordConverter(True), interactions.slash_float_option("in the range [0, 1], positive is upward")]
 
 
 class Edit(interactions.Extension):
