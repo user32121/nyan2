@@ -22,7 +22,7 @@ class Timezone(interactions.Extension):
 
     @interactions.slash_command(** util.command_args, name="timezone", description="get a global timestamp for a datetime")
     async def timezone(self, ctx: interactions.SlashContext,
-                       datetime: typing.Annotated[str, interactions.slash_str_option(description="preferred format: mm/dd/yyyy ZZ hh:mm:ss MM", required=True)],
+                       datetime: typing.Annotated[str, interactions.slash_str_option(description="preferred format: mm/dd/yyyy hh:mm:ss MM ZZ", required=True)],
                        ) -> None:
         await util.preprocess(ctx)
         msg = ""
