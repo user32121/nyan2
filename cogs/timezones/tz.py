@@ -1,6 +1,9 @@
-# modified of https://gist.github.com/h-j-13/e3a585796510b59601e34a07e99b386d
+# modified from https://gist.github.com/h-j-13/e3a585796510b59601e34a07e99b386d
 
-# TODO make DST aware
+import dateutil.zoneinfo
+
+
+zf = dateutil.zoneinfo.get_zonefile_instance()
 timezone_info = {
     "A": int(1 * 3600),
     "ACDT": int(10.5 * 3600),
@@ -56,7 +59,7 @@ timezone_info = {
     "CLT": int(-4 * 3600),
     "COT": int(-5 * 3600),
     "CST": int(-6 * 3600),
-    "CT": int(-6 * 3600),
+    "CT": zf.get("US/Central"),
     "CVT": int(-1 * 3600),
     "CXT": int(7 * 3600),
     "ChST": int(10 * 3600),
@@ -74,7 +77,7 @@ timezone_info = {
     "EGST": int(0 * 3600),
     "EGT": int(-1 * 3600),
     "EST": int(-5 * 3600),
-    "ET": int(-5 * 3600),
+    "ET": zf.get("US/Eastern"),
     "F": int(6 * 3600),
     "FET": int(3 * 3600),
     "FJST": int(13 * 3600),
@@ -129,7 +132,7 @@ timezone_info = {
     "MSD": int(4 * 3600),
     "MSK": int(3 * 3600),
     "MST": int(-7 * 3600),
-    "MT": int(-7 * 3600),
+    "MT": zf.get("US/Mountain"),
     "MUT": int(4 * 3600),
     "MVT": int(5 * 3600),
     "MYT": int(8 * 3600),
@@ -162,7 +165,7 @@ timezone_info = {
     "PMST": int(-3 * 3600),
     "PONT": int(11 * 3600),
     "PST": int(-8 * 3600),
-    "PT": int(-8 * 3600),
+    "PT": zf.get("US/Pacific"),
     "PWT": int(9 * 3600),
     "PYST": int(-3 * 3600),
     "PYT": int(-4 * 3600),

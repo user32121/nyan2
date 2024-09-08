@@ -4,9 +4,6 @@ import warnings
 
 import dateutil.parser
 import dateutil.parser._parser
-import dateutil.tz
-import dateutil.utils
-import dateutil.zoneinfo
 import interactions
 
 import util
@@ -30,7 +27,7 @@ class Timezone(interactions.Extension):
             warnings.filterwarnings("error", module="dateutil.parser._parser")
             dt = dateutil.parser.parse(datetime, tzinfos=tz.timezone_info)
         except dateutil.parser._parser.UnknownTimezoneWarning as e:
-            msg = f"warning: {type(e)}\nresults might not be accurate\n"
+            msg = f"warning: {type(e)}\n"
             warnings.resetwarnings()
             dt = dateutil.parser.parse(datetime, tzinfos=tz.timezone_info)
         finally:
