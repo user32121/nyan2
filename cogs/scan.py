@@ -34,22 +34,24 @@ async def fill_cache(bot: interactions.Client, channel: interactions.TYPE_MESSAG
         cache_locks[channel.id] = asyncio.Lock()
     if (cache_locks[channel.id].locked()):
         await ctx_updates.edit(content="another command is currently filling the cache")
-    await cache_locks[channel.id].acquire()
 
-    if (channel.id not in message_cache):
-        message_cache[channel.id] = []
-    await ctx_updates.edit(content=f"filling cache: {len(message_cache[channel.id])} messages")
-    last_updated = time.time()
-
-    is_newest_message = True
-    async for m in channel.history(limit=0, after=most_recent_cached.get(channel.id, None)):
-        m: interactions.Message
-        if (is_newest_message):
-            most_recent_cached[channel.id] = m.id
-            is_newest_message = False
-        if (time.time() - last_updated >= 5):
+    try:
+        async with cache_locks[channel.id]:
+            if (channel.id not in message_cache):
+                message_cache[channel.id] = []
             await ctx_updates.edit(content=f"filling cache: {len(message_cache[channel.id])} messages")
             last_updated = time.time()
-        message_cache[channel.id].append((m.id, m.author.id, m.content))
-    await ctx_updates.edit(content=f"finished filling cache: {len(message_cache[channel.id])} messages")
-    cache_locks[channel.id].release()
+
+            is_newest_message = True
+            async for m in channel.history(limit=0, after=most_recent_cached.get(channel.id, None)):
+                m: interactions.Message
+                if (is_newest_message):
+                    most_recent_cached[channel.id] = m.id
+                    is_newest_message = False
+                if (time.time() - last_updated >= 5):
+                    await ctx_updates.edit(content=f"filling cache: {len(message_cache[channel.id])} messages")
+                    last_updated = time.time()
+                message_cache[channel.id].append((m.id, m.author.id, m.content))
+            await ctx_updates.edit(content=f"finished filling cache: {len(message_cache[channel.id])} messages")
+    except:
+        raise
