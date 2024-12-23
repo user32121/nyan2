@@ -26,20 +26,21 @@ most_recent_cached: dict[int, int] = {}
 message_cache: dict[int, list[tuple[int, int, str]]] = {}
 
 
-async def fill_cache(bot: interactions.Client, channel: interactions.TYPE_MESSAGEABLE_CHANNEL, ctx_updates: interactions.SlashContext):
-    await ctx_updates.send("preparing to fill cache")
+async def fill_cache(bot: interactions.Client, channel: interactions.TYPE_MESSAGEABLE_CHANNEL, ctx: interactions.SlashContext):
+    ctx2 = util.PsuedoContext(ctx)
+    await ctx2.send(content="preparing to fill cache")
     await asyncio.sleep(1)
 
     if (channel.id not in cache_locks):
         cache_locks[channel.id] = asyncio.Lock()
     if (cache_locks[channel.id].locked()):
-        await ctx_updates.edit(content="another command is currently filling the cache")
+        await ctx2.edit(content="another command is currently filling the cache")
 
     try:
         async with cache_locks[channel.id]:
             if (channel.id not in message_cache):
                 message_cache[channel.id] = []
-            await ctx_updates.edit(content=f"filling cache: {len(message_cache[channel.id])} messages")
+            await ctx2.edit(content=f"filling cache: {len(message_cache[channel.id])} messages")
             last_updated = time.time()
 
             is_newest_message = True
@@ -49,9 +50,9 @@ async def fill_cache(bot: interactions.Client, channel: interactions.TYPE_MESSAG
                     most_recent_cached[channel.id] = m.id
                     is_newest_message = False
                 if (time.time() - last_updated >= 5):
-                    await ctx_updates.edit(content=f"filling cache: {len(message_cache[channel.id])} messages")
+                    await ctx2.edit(content=f"filling cache: {len(message_cache[channel.id])} messages")
                     last_updated = time.time()
                 message_cache[channel.id].append((m.id, m.author.id, m.content))
-            await ctx_updates.edit(content=f"finished filling cache: {len(message_cache[channel.id])} messages")
+            await ctx2.edit(content=f"finished filling cache: {len(message_cache[channel.id])} messages")
     except:
         raise

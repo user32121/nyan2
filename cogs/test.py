@@ -5,7 +5,6 @@ import interactions
 
 import util
 
-from .edits import util as edit_util
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +17,7 @@ class Test(interactions.Extension):
     async def test(self, ctx: interactions.SlashContext,
                    ) -> None:
         await util.preprocess(ctx)
-        ctx2 = edit_util.PsuedoContext(ctx)
+        ctx2 = util.PsuedoContext(ctx)
         await ctx2.send(content="message1 (next message in 10 seconds)")
         await asyncio.sleep(10)
         await ctx2.send(content="message2 (next message in 15 minutes 10 seconds)")

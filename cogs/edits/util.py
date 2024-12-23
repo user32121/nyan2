@@ -10,6 +10,8 @@ import numpy.typing
 import PIL.Image
 import PIL.ImageColor
 
+from util import PsuedoContext
+
 logger = logging.getLogger(__name__)
 
 T = typing.TypeVar("T")
@@ -67,20 +69,6 @@ def unnormalize_coordinates(coords: np.ndarray, shape: tuple[int, int], center: 
     centered = coords * m / 2
     unnormalized = centered + np.array(shape) * center
     return unnormalized
-
-
-class PsuedoContext:
-    """A class with a send method. Minimally imitates a SlashContext. For commands where the context expires before it finishes."""
-
-    def __init__(self, ctx: interactions.Message | interactions.SlashContext) -> None:
-        self.ctx = ctx
-
-    async def send(self, **kwargs) -> interactions.Message:
-        if (isinstance(self.ctx, interactions.SlashContext)):
-            self.ctx = await self.ctx.send(**kwargs)
-        else:
-            self.ctx = await self.ctx.reply(**kwargs)
-        return self.ctx
 
 
 class MultiprocessingResult(typing.Generic[T]):

@@ -355,7 +355,7 @@ class Edit(interactions.Extension):
                       file: file_option,
                       ) -> None:
         await util.preprocess(ctx)
-        ctx2 = edit_util.PsuedoContext(ctx)
+        ctx2 = util.PsuedoContext(ctx)
         img = image_io.from_url(file.proxy_url)
         args = ()
         img = await edit_util.run_in_subprocess(ctx2, misc.upscale, (img, *args))
@@ -397,7 +397,7 @@ class Edit(interactions.Extension):
         await util.preprocess(ctx)
         if (self.last_img == None or self.last_send_args == None):
             raise interactions.errors.BadArgument("no edit has been run since startup")
-        ctx2 = edit_util.PsuedoContext(ctx)
+        ctx2 = util.PsuedoContext(ctx)
         img = await edit_util.run_in_subprocess(ctx2, meta.repeat, (self.last_img, self.last_edit, self.last_args))
         await edit_util.run_in_subprocess(ctx2, image_io.send_file, (img,), self.last_send_args)
         self.last_img = img

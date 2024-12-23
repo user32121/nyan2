@@ -74,3 +74,20 @@ async def get_emoji(ctx: interactions.SlashContext, ids: str) -> interactions.Cu
     if (emoji == None):
         raise interactions.errors.BadArgument(f"could not find emoji {ids}")
     return emoji
+
+
+class PsuedoContext:
+    """A class with a send method. Minimally imitates a SlashContext. For commands where the context expires before it finishes."""
+
+    def __init__(self, ctx: interactions.Message | interactions.SlashContext) -> None:
+        self.ctx = ctx
+
+    async def send(self, **kwargs) -> interactions.Message:
+        if (isinstance(self.ctx, interactions.SlashContext)):
+            self.ctx = await self.ctx.send(**kwargs)
+        else:
+            self.ctx = await self.ctx.reply(**kwargs)
+        return self.ctx
+
+    async def edit(self, **kwargs) -> interactions.Message:
+        return await self.ctx.edit(**kwargs)
