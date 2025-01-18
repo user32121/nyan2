@@ -139,3 +139,7 @@ def ash(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], del
         ar2[xys2[:, 0], xys2[:, 1]] = (1 - grad2) * np.repeat(ar[mask], 4, axis=0) + grad2 * [46, 28, 12, 255]
         imgs[i] = util.ImageFrame(PIL.Image.fromarray(ar2, "RGBA"), delays[i])
     return imgs
+
+
+def reverse(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
+    return imgs[::-1]

@@ -311,6 +311,17 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, animated.ash, args, {}
 
+    @animated_group.subcommand(sub_cmd_name="reverse", sub_cmd_description="reverse a gif")
+    async def reverse(self, ctx: interactions.SlashContext,
+                      file: file_option,
+                      ) -> None:
+        await util.preprocess(ctx)
+        img = image_io.from_url(file.proxy_url)
+        args = ()
+        img = await edit_util.run_in_subprocess(ctx, animated.reverse, (img, *args))
+        await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
+        self.last_img, self.last_edit, self.last_args, self.last_send_args = img, animated.reverse, args, {}
+
     @misc_group.subcommand(sub_cmd_name="snap", sub_cmd_description="swap pixels around")
     async def snap(self, ctx: interactions.SlashContext,
                    file: file_option,
