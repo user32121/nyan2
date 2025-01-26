@@ -55,21 +55,27 @@ def from_url(url: str) -> list[util.ImageFrame]:
 def send_file(ctx: util.MultiprocessingPsuedoContext, img: list[util.ImageFrame], allow_downscaling=True):
     from . import misc
     f, ext = to_file(img)
-    file_size = f.seek(0, 2)
-    while allow_downscaling and file_size > config.MAX_FILE_SIZE:
-        ctx.send(content=f"{file_size} > {config.MAX_FILE_SIZE} bytes, downscaling...")
-        img = misc.downscale(ctx, img)
-        f, ext = to_file(img)
-        file_size = f.seek(0, 2)
-    f.seek(0)
-    if (file_size <= config.MAX_FILE_SIZE):
-        ctx.send(file=interactions.File(f, f"file.{ext}"))
-    else:
-        ctx.send(content=f"{file_size} > {config.MAX_FILE_SIZE} bytes, using tmpfiles.org...")
-        res = requests.post(url="https://tmpfiles.org/api/v1/upload", files={"file": (f"{random.randint(0, 1 << 64):x}.{ext}", f)})
-        if (res.status_code == 200):
-            url = res.json()["data"]["url"]
-            url = re.sub(r"https:\/\/tmpfiles\.org\/(\d+\/\w+\.\w+)", r"https://tmpfiles.org/dl/\1", url)
-            ctx.send(content=url)
-        else:
-            raise RuntimeError(res.content)
+    while True:
+        try:
+            ctx.send(file=interactions.File(f, f"file.{ext}"))
+        except requests.HTTPError as e:
+            if e.errno != 413:
+                raise
+            else:
+                file_size = f.seek(0, 2)
+                f.seek(0)
+                if allow_downscaling:
+                    ctx.send(content=f"file too large ({file_size} bytes), downscaling...")
+                    img = misc.downscale(ctx, img)
+                    f, ext = to_file(img)
+                    continue
+                else:
+                    ctx.send(content=f"file too large ({file_size} bytes), using tmpfiles.org...")
+                    res = requests.post(url="https://tmpfiles.org/api/v1/upload", files={"file": (f"{random.randint(0, 1 << 64):x}.{ext}", f)})
+                    if (res.status_code == 200):
+                        url = res.json()["data"]["url"]
+                        url = re.sub(r"https:\/\/tmpfiles\.org\/(\d+\/\w+\.\w+)", r"https://tmpfiles.org/dl/\1", url)
+                        ctx.send(content=url)
+                    else:
+                        raise RuntimeError(res.content)
+        break
