@@ -79,7 +79,7 @@ categories: dict[str, dict[str, RandomEditType]] = {
 # presets
 presets: dict[str, dict[str, RandomEditType]] = {
     "all": basic_edits | blur_edits | animated_edits | misc_edits,
-    "default": {x: basic_edits[x] for x in ["tint", "grid", "text"]} | blur_edits | animated_edits | misc_edits,
+    "default": {x: basic_edits[x] for x in ["tint", "grid", "text"]} | animated_edits | misc_edits,
     "no_basic": blur_edits | animated_edits | misc_edits,
     "no_basic, no_blur": animated_edits | misc_edits,
     "none": {},
