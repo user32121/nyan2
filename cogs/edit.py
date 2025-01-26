@@ -141,7 +141,7 @@ class Edit(interactions.Extension):
     @basic_group.subcommand(sub_cmd_name="grid", sub_cmd_description="display a grid for easier finding of coordinates")
     async def grid(self, ctx: interactions.SlashContext,
                    file: file_option,
-                   thickness: typing.Annotated[int, interactions.slash_int_option("line thickness, in pixels")] = 1,
+                   thickness: typing.Annotated[int, interactions.slash_int_option("line thickness, in pixels, default: 1")] = 1,
                    colour: colour_option = (0, 0, 0, 255),
                    ) -> None:
         await util.preprocess(ctx)
@@ -155,7 +155,7 @@ class Edit(interactions.Extension):
     async def text(self, ctx: interactions.SlashContext,
                    file: file_option,
                    caption: typing.Annotated[str, interactions.slash_str_option(r"text to put on the image, separated by a ','. Escape with '\' to avoid splitting", True)],
-                   font_size: typing.Annotated[int, interactions.slash_float_option("relative size of caption")] = 1,
+                   font_size: typing.Annotated[int, interactions.slash_float_option("relative size of caption, default: 1")] = 1,
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
@@ -167,7 +167,7 @@ class Edit(interactions.Extension):
     @blur_group.subcommand(sub_cmd_name="blur", sub_cmd_description="apply a gaussian blur")
     async def blur(self, ctx: interactions.SlashContext,
                    file: file_option,
-                   radius: typing.Annotated[float, interactions.slash_float_option("in pixels")] = 5,
+                   radius: typing.Annotated[float, interactions.slash_float_option("in pixels, default: 5")] = 5,
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
@@ -179,8 +179,8 @@ class Edit(interactions.Extension):
     @blur_group.subcommand(sub_cmd_name="motionblur", sub_cmd_description="apply a motion blur")
     async def motionblur(self, ctx: interactions.SlashContext,
                          file: file_option,
-                         length: typing.Annotated[int, interactions.slash_int_option("in pixels")] = 10,
-                         angle: typing.Annotated[float, interactions.slash_float_option("counter clockwise from the x axis, in degrees")] = 30,
+                         length: typing.Annotated[int, interactions.slash_int_option("in pixels, default: 10")] = 10,
+                         angle: typing.Annotated[float, interactions.slash_float_option("counter clockwise from the x axis, in degrees, default: 30")] = 30,
                          ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
@@ -192,7 +192,7 @@ class Edit(interactions.Extension):
     @blur_group.subcommand(sub_cmd_name="zoomblur", sub_cmd_description="apply a zoom blur")
     async def zoomblur(self, ctx: interactions.SlashContext,
                        file: file_option,
-                       zoom: typing.Annotated[float, interactions.slash_float_option("zoom multiplier")] = 1.1,
+                       zoom: typing.Annotated[float, interactions.slash_float_option("zoom multiplier, default: 1.1")] = 1.1,
                        interpolation: typing.Annotated[int, interactions.slash_int_option("number of interpolated values; more means higher quality, but slower", min_value=1)] = 30,
                        ) -> None:
         await util.preprocess(ctx)
@@ -205,7 +205,7 @@ class Edit(interactions.Extension):
     @blur_group.subcommand(sub_cmd_name="circularblur", sub_cmd_description="apply a circular blur")
     async def circularblur(self, ctx: interactions.SlashContext,
                            file: file_option,
-                           angle: typing.Annotated[float, interactions.slash_float_option("in degrees")] = 15,
+                           angle: typing.Annotated[float, interactions.slash_float_option("in degrees, default: 15")] = 15,
                            interpolation: typing.Annotated[int, interactions.slash_int_option("number of interpolated values; more means higher quality, but slower", min_value=1)] = 30,
                            ) -> None:
         await util.preprocess(ctx)
@@ -220,7 +220,7 @@ class Edit(interactions.Extension):
                    file: file_option,
                    delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
                    frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 10,
-                   amount: typing.Annotated[float, interactions.slash_float_option("strength")] = 2,
+                   amount: typing.Annotated[float, interactions.slash_float_option("strength, default: 2")] = 2,
                    center_x: coord_x_option = 0.5,
                    center_y: coord_y_option = 0.5,
                    ) -> None:
@@ -251,8 +251,8 @@ class Edit(interactions.Extension):
                       delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 100,
                       frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 18,
                       cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
-                      scale_x: typing.Annotated[float, interactions.slash_float_option("closeness of vertical stripes")] = 1,
-                      scale_y: typing.Annotated[float, interactions.slash_float_option("closeness of horizontal stripes")] = 1,
+                      scale_x: typing.Annotated[float, interactions.slash_float_option("closeness of vertical stripes, default: 1")] = 1,
+                      scale_y: typing.Annotated[float, interactions.slash_float_option("closeness of horizontal stripes, default: 1")] = 1,
                       ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
@@ -267,7 +267,7 @@ class Edit(interactions.Extension):
                    delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
                    frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 5,
                    cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
-                   radius: typing.Annotated[float, interactions.slash_float_option("strength of the offset, in normalized units")] = 0.5,
+                   radius: typing.Annotated[float, interactions.slash_float_option("strength of the offset, in normalized units, default: 0.5")] = 0.5,
                    center_x: coord_x_option = 0.5,
                    center_y: coord_y_option = 0.5,
                    ) -> None:
@@ -284,7 +284,7 @@ class Edit(interactions.Extension):
                      delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 100,
                      frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 5,
                      cycles: typing.Annotated[float, interactions.slash_float_option("number of cycles per gif loop")] = 1,
-                     amount: typing.Annotated[float, interactions.slash_float_option("stretch multiplier")] = 1,
+                     amount: typing.Annotated[float, interactions.slash_float_option("stretch multiplier, default: 1")] = 1,
                      ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
@@ -298,11 +298,11 @@ class Edit(interactions.Extension):
                   file: file_option,
                   delay: typing.Annotated[int, interactions.slash_int_option("delay between frames if one is not already present, in milliseconds", min_value=0)] = 50,
                   frames: typing.Annotated[int, interactions.slash_int_option("number of frames to create if input is a static image", min_value=1)] = 50,
-                  time_steps: typing.Annotated[float, interactions.slash_float_option("units of time to simulate")] = 3,
-                  spread_delay: typing.Annotated[float, interactions.slash_float_option("units of time between changing colour and moving")] = 0.2,
-                  spread_amount: typing.Annotated[float, interactions.slash_float_option("how much pixels spread out", min_value=0)] = 0.2,
-                  gravity_x: typing.Annotated[float, interactions.slash_float_option("direction the pixels accelerate")] = 0,
-                  gravity_y: typing.Annotated[float, interactions.slash_float_option("direction the pixels accelerate")] = -0.5,
+                  time_steps: typing.Annotated[float, interactions.slash_float_option("units of time to simulate, default: 3")] = 3,
+                  spread_delay: typing.Annotated[float, interactions.slash_float_option("units of time between changing colour and moving, default: 0.2")] = 0.2,
+                  spread_amount: typing.Annotated[float, interactions.slash_float_option("how much pixels spread out, default: 0.2", min_value=0)] = 0.2,
+                  gravity_x: typing.Annotated[float, interactions.slash_float_option("direction the pixels accelerate, default: 0")] = 0,
+                  gravity_y: typing.Annotated[float, interactions.slash_float_option("direction the pixels accelerate, default: -0.5")] = -0.5,
                   ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
@@ -325,8 +325,8 @@ class Edit(interactions.Extension):
     @misc_group.subcommand(sub_cmd_name="snap", sub_cmd_description="swap pixels around")
     async def snap(self, ctx: interactions.SlashContext,
                    file: file_option,
-                   steps: typing.Annotated[float, interactions.slash_float_option("approximate number of steps, normalized (multiplied by number of pixels)", min_value=0)] = 2,
-                   fuzzy: typing.Annotated[bool, interactions.slash_bool_option("whether to blend or swap pixels")] = False,
+                   steps: typing.Annotated[float, interactions.slash_float_option("approximate number of steps, normalized (multiplied by number of pixels), default: 2", min_value=0)] = 2,
+                   fuzzy: typing.Annotated[bool, interactions.slash_bool_option("whether to blend or swap pixels, default: false")] = False,
                    ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
@@ -338,7 +338,7 @@ class Edit(interactions.Extension):
     @misc_group.subcommand(sub_cmd_name="magic", sub_cmd_description="spread out pixels")
     async def magic(self, ctx: interactions.SlashContext,
                     file: file_option,
-                    steps: typing.Annotated[float, interactions.slash_float_option("approximate number of steps, normalized (multiplied by number of pixels)", min_value=0)] = 2,
+                    steps: typing.Annotated[float, interactions.slash_float_option("approximate number of steps, normalized (multiplied by number of pixels), default: 2", min_value=0)] = 2,
                     ) -> None:
         await util.preprocess(ctx)
         img = image_io.from_url(file.proxy_url)
@@ -350,7 +350,7 @@ class Edit(interactions.Extension):
     @misc_group.subcommand(sub_cmd_name="bulge", sub_cmd_description="add a bulge")
     async def bulge(self, ctx: interactions.SlashContext,
                     file: file_option,
-                    amount: typing.Annotated[float, interactions.slash_float_option("strength")] = 1,
+                    amount: typing.Annotated[float, interactions.slash_float_option("strength, default: 1")] = 1,
                     center_x: coord_x_option = 0.5,
                     center_y: coord_y_option = 0.5,
                     ) -> None:
@@ -387,7 +387,7 @@ class Edit(interactions.Extension):
     @meta_group.subcommand(sub_cmd_name="random", sub_cmd_description="perform random edits")
     async def random(self, ctx: interactions.SlashContext,
                      file: file_option,
-                     iterations: typing.Annotated[int, interactions.slash_int_option("number of times to use another command", min_value=0)] = 3,
+                     iterations: typing.Annotated[int, interactions.slash_int_option("number of times to use another command, default: 3", min_value=0)] = 3,
                      preset: typing.Annotated[str, interactions.slash_str_option("presets containing which edits are allowed", choices=util.as_choices(["all", "default", "no_basic", "no_basic, no_blur", "none"]))] = "default",
                      allow_basic: typing.Annotated[typing.Optional[bool], interactions.slash_bool_option("whether to allow basic edits")] = None,
                      allow_blur: typing.Annotated[typing.Optional[bool], interactions.slash_bool_option("whether to allow blur edits")] = None,
