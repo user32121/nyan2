@@ -26,7 +26,7 @@ most_recent_cached: dict[int, int] = {}
 message_cache: dict[int, list[tuple[int, int, str]]] = {}
 
 
-async def fill_cache(bot: interactions.Client, channel: interactions.TYPE_MESSAGEABLE_CHANNEL, ctx: interactions.SlashContext):
+async def fill_cache(bot: interactions.Client, channel: interactions.TYPE_MESSAGEABLE_CHANNEL, ctx: interactions.SlashContext) -> util.PsuedoContext:
     ctx2 = util.PsuedoContext(ctx)
     await ctx2.send(content="preparing to fill cache")
     await asyncio.sleep(1)
@@ -56,3 +56,4 @@ async def fill_cache(bot: interactions.Client, channel: interactions.TYPE_MESSAG
             await ctx2.edit(content=f"finished filling cache: {len(message_cache[channel.id])} messages")
     except:
         raise
+    return ctx2

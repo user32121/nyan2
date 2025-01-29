@@ -23,7 +23,7 @@ class Search(interactions.Extension):
                      reply: typing.Annotated[bool, interactions.slash_bool_option("whether to reply to the first match")] = False,
                      ) -> None:
         await util.preprocess(ctx)
-        await scan.fill_cache(ctx.bot, ctx.channel, ctx)
+        ctx2 = await scan.fill_cache(ctx.bot, ctx.channel, ctx)
         if (regex):
             def matches(s: str) -> int:
                 return len(re.findall(query, s))
@@ -36,7 +36,7 @@ class Search(interactions.Extension):
         for message_id, author_id, content in scan.message_cache[ctx.channel_id]:
             match_count = matches(content)
             if (reply and match_count):
-                m = await ctx.channel.fetch_message(message_id)
+                m = await ctx2.ctx.channel.fetch_message(message_id)
                 if (m != None):
                     reply = False
                     await m.reply("found")
@@ -49,9 +49,9 @@ class Search(interactions.Extension):
         sorted_counts = sorted(match_counts.items(), key=lambda x: x[1], reverse=True)
         output = f"total matches: {sum(match_counts.values())}/{sum(counts.values())} ({round(sum(match_counts.values())/sum(counts.values()), 3)})"
         for author_id, match_count in sorted_counts:
-            user = await ctx.bot.fetch_user(author_id)
+            user = await self.bot.fetch_user(author_id)
             if (user == None):
                 output += f"\n{user}: {match_count}/{counts[author_id]} ({round(match_count/counts[author_id], 3)})"
             else:
                 output += f"\n{user.display_name}: {match_count}/{counts[author_id]} ({round(match_count/counts[author_id], 3)})"
-        await ctx.send(output)
+        await ctx2.send(content=output)
