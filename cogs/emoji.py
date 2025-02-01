@@ -12,6 +12,7 @@ class Emoji(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
 
+    @util.store_command()
     @interactions.slash_command(** util.command_args, name="emoji", description="send emojis")
     async def emoji(self, ctx: interactions.SlashContext,
                     guild: typing.Annotated[typing.Optional[str], interactions.slash_str_option("the guild or \"all\"; defaults to the current guild")] = None,

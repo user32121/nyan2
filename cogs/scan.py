@@ -13,6 +13,7 @@ class Scan(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
 
+    @util.store_command()
     @interactions.slash_command(** util.command_args, name="scan", description="preload all messages from a channel for faster searching")
     async def scan(self, ctx: interactions.SlashContext,
                    ) -> None:

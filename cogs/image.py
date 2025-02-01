@@ -16,6 +16,7 @@ class Image(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
 
+    @util.store_command()
     @interactions.slash_command(** util.command_args, name="image", description="send an image")
     async def image(self, ctx: interactions.SlashContext,
                     image: typing.Annotated[str, interactions.slash_str_option("the image file", True, choices=util.as_choices(os.listdir(os.path.join("cogs", "images"))))],

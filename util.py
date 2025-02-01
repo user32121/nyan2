@@ -91,3 +91,22 @@ class PsuedoContext:
 
     async def edit(self, **kwargs) -> interactions.Message:
         return await self.ctx.edit(**kwargs)
+
+
+all_commands: list[tuple[str, str, str]] = []
+
+
+def filter_description(s:  str) -> typing.Optional[str]:
+    if s == "No Description Set":
+        return None
+    return s
+
+
+def store_command(keyword: str = "") -> typing.Callable[[interactions.SlashCommand], interactions.SlashCommand]:
+    def store(sc: interactions.SlashCommand) -> interactions.SlashCommand:
+        name = sc.resolved_name
+        kw = str(keyword or sc.sub_cmd_name or sc.group_name or sc.name)
+        description = filter_description(str(sc.sub_cmd_description)) or filter_description(str(sc.group_description)) or filter_description(str(sc.description)) or "Error"
+        all_commands.append((name, kw, description))
+        return sc
+    return store

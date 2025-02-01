@@ -15,6 +15,7 @@ class Brainfuck(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
 
+    @util.store_command()
     @interactions.slash_command(** util.command_args, name="brainfuck", description="run a brainfuck program (10 second time limit)")
     async def brainfuck(self, ctx: interactions.SlashContext,
                         program: typing.Annotated[str, interactions.slash_str_option("instructions to run", True)],

@@ -17,6 +17,7 @@ class Timezone(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
 
+    @util.store_command()
     @interactions.slash_command(** util.command_args, name="timezone", description="get a global timestamp for a datetime")
     async def timezone(self, ctx: interactions.SlashContext,
                        time: typing.Annotated[str, interactions.slash_str_option(description="preferred format: mm/dd/yyyy hh:mm:ss MM ZZ", required=True)],

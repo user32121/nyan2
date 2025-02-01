@@ -16,10 +16,11 @@ class Earrape(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
 
-    @interactions.slash_command(** util.command_args, name="earrape")
+    @util.store_command()
+    @interactions.slash_command(** util.command_args, name="earrape", description="make stuff very loud")
     async def earrape(self, ctx: interactions.SlashContext,
                       file: typing.Annotated[interactions.Attachment, interactions.slash_attachment_option("the file to modify", True)],
-                      gain: typing.Annotated[int, interactions.slash_int_option("the amount to increase by")] = 10,
+                      gain: typing.Annotated[int, interactions.slash_int_option("the amount to increase by, default: 10")] = 10,
                       ) -> None:
         await util.preprocess(ctx)
         res = requests.get(file.proxy_url)

@@ -37,6 +37,7 @@ class Edit(interactions.Extension):
         self.last_args: typing.Optional[tuple] = None
         self.last_send_args: typing.Optional[dict[str, typing.Any]] = None
 
+    @util.store_command()
     @basic_group.subcommand(sub_cmd_name="red", sub_cmd_description="isolate the red component")
     async def red(self, ctx: interactions.SlashContext,
                   file: file_option,
@@ -48,6 +49,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, basic.multiply, args, {}
 
+    @util.store_command()
     @basic_group.subcommand(sub_cmd_name="green", sub_cmd_description="isolate the green component")
     async def green(self, ctx: interactions.SlashContext,
                     file: file_option,
@@ -59,6 +61,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, basic.multiply, args, {}
 
+    @util.store_command()
     @basic_group.subcommand(sub_cmd_name="blue", sub_cmd_description="isolate the blue component")
     async def blue(self, ctx: interactions.SlashContext,
                    file: file_option,
@@ -70,6 +73,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, basic.multiply, args, {}
 
+    @util.store_command()
     @basic_group.subcommand(sub_cmd_name="hsv_hue", sub_cmd_description="isolate the HSV hue")
     async def hue(self, ctx: interactions.SlashContext,
                   file: file_option,
@@ -81,6 +85,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, basic.hsv_hue, args, {}
 
+    @util.store_command()
     @basic_group.subcommand(sub_cmd_name="hsv_saturation", sub_cmd_description="isolate the HSV saturation")
     async def saturation(self, ctx: interactions.SlashContext,
                          file: file_option,
@@ -92,6 +97,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, basic.hsv_saturation, args, {}
 
+    @util.store_command()
     @basic_group.subcommand(sub_cmd_name="hsv_value", sub_cmd_description="isolate the HSV value")
     async def value(self, ctx: interactions.SlashContext,
                     file: file_option,
@@ -103,6 +109,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, basic.hsv_value, args, {}
 
+    @util.store_command()
     @basic_group.subcommand(sub_cmd_name="invert", sub_cmd_description="invert")
     async def invert(self, ctx: interactions.SlashContext,
                      file: file_option,
@@ -114,6 +121,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, basic.invert, args, {}
 
+    @util.store_command()
     @basic_group.subcommand(sub_cmd_name="tint", sub_cmd_description="average with a colour")
     async def tint(self, ctx: interactions.SlashContext,
                    file: file_option,
@@ -126,6 +134,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, basic.tint, args, {}
 
+    @util.store_command()
     @basic_group.subcommand(sub_cmd_name="multiply", sub_cmd_description="multiply by a colour")
     async def multiply(self, ctx: interactions.SlashContext,
                        file: file_option,
@@ -138,6 +147,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, basic.multiply, args, {}
 
+    @util.store_command()
     @basic_group.subcommand(sub_cmd_name="grid", sub_cmd_description="display a grid for easier finding of coordinates")
     async def grid(self, ctx: interactions.SlashContext,
                    file: file_option,
@@ -151,6 +161,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, basic.grid, args, {}
 
+    @util.store_command(keyword="caption")
     @basic_group.subcommand(sub_cmd_name="text", sub_cmd_description="add text")
     async def text(self, ctx: interactions.SlashContext,
                    file: file_option,
@@ -164,6 +175,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, basic.add_caption, args, {}
 
+    @util.store_command()
     @blur_group.subcommand(sub_cmd_name="blur", sub_cmd_description="apply a gaussian blur")
     async def blur(self, ctx: interactions.SlashContext,
                    file: file_option,
@@ -176,6 +188,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, blur.gaussianblur, args, {}
 
+    @util.store_command()
     @blur_group.subcommand(sub_cmd_name="motionblur", sub_cmd_description="apply a motion blur")
     async def motionblur(self, ctx: interactions.SlashContext,
                          file: file_option,
@@ -189,6 +202,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, blur.motionblur, args, {}
 
+    @util.store_command()
     @blur_group.subcommand(sub_cmd_name="zoomblur", sub_cmd_description="apply a zoom blur")
     async def zoomblur(self, ctx: interactions.SlashContext,
                        file: file_option,
@@ -202,6 +216,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, blur.zoomblur, args, {}
 
+    @util.store_command()
     @blur_group.subcommand(sub_cmd_name="circularblur", sub_cmd_description="apply a circular blur")
     async def circularblur(self, ctx: interactions.SlashContext,
                            file: file_option,
@@ -215,6 +230,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, blur.circularblur, args, {}
 
+    @util.store_command()
     @animated_group.subcommand(sub_cmd_name="boom", sub_cmd_description="explosion")
     async def boom(self, ctx: interactions.SlashContext,
                    file: file_option,
@@ -231,6 +247,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, animated.boom, args, {}
 
+    @util.store_command()
     @animated_group.subcommand(sub_cmd_name="rave", sub_cmd_description="apply a hue shift that changes with time")
     async def rave(self, ctx: interactions.SlashContext,
                    file: file_option,
@@ -245,6 +262,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, animated.hueshift, args, {}
 
+    @util.store_command()
     @animated_group.subcommand(sub_cmd_name="rainbow", sub_cmd_description="apply a hue shift that changes with time and position")
     async def rainbow(self, ctx: interactions.SlashContext,
                       file: file_option,
@@ -261,6 +279,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, animated.hueshift, args, {}
 
+    @util.store_command()
     @animated_group.subcommand(sub_cmd_name="spin", sub_cmd_description="stretch the center around")
     async def spin(self, ctx: interactions.SlashContext,
                    file: file_option,
@@ -278,6 +297,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, animated.spin, args, {}
 
+    @util.store_command()
     @animated_group.subcommand(sub_cmd_name="squish", sub_cmd_description="stretch horizontally and vertically")
     async def squish(self, ctx: interactions.SlashContext,
                      file: file_option,
@@ -293,6 +313,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, animated.squish, args, {}
 
+    @util.store_command()
     @animated_group.subcommand(sub_cmd_name="ash", sub_cmd_description="make images turn to ashes")
     async def ash(self, ctx: interactions.SlashContext,
                   file: file_option,
@@ -311,6 +332,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, animated.ash, args, {}
 
+    @util.store_command()
     @animated_group.subcommand(sub_cmd_name="reverse", sub_cmd_description="reverse a gif")
     async def reverse(self, ctx: interactions.SlashContext,
                       file: file_option,
@@ -322,6 +344,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, animated.reverse, args, {}
 
+    @util.store_command()
     @misc_group.subcommand(sub_cmd_name="snap", sub_cmd_description="swap pixels around")
     async def snap(self, ctx: interactions.SlashContext,
                    file: file_option,
@@ -335,6 +358,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, misc.snap, args, {}
 
+    @util.store_command()
     @misc_group.subcommand(sub_cmd_name="magic", sub_cmd_description="spread out pixels")
     async def magic(self, ctx: interactions.SlashContext,
                     file: file_option,
@@ -347,6 +371,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, misc.magic, args, {}
 
+    @util.store_command()
     @misc_group.subcommand(sub_cmd_name="bulge", sub_cmd_description="add a bulge")
     async def bulge(self, ctx: interactions.SlashContext,
                     file: file_option,
@@ -361,6 +386,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, misc.bulge, args, {}
 
+    @util.store_command()
     @misc_group.subcommand(sub_cmd_name="upscale", sub_cmd_description="double the image size using Waifu2x")
     async def upscale(self, ctx: interactions.SlashContext,
                       file: file_option,
@@ -373,6 +399,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx2, image_io.send_file, (img, False))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, misc.upscale, args, {"allow_downscaling": False}
 
+    @util.store_command()
     @misc_group.subcommand(sub_cmd_name="downscale", sub_cmd_description="half the image size")
     async def downscale(self, ctx: interactions.SlashContext,
                         file: file_option,
@@ -384,6 +411,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, misc.downscale, args, {}
 
+    @util.store_command()
     @meta_group.subcommand(sub_cmd_name="random", sub_cmd_description="perform random edits")
     async def random(self, ctx: interactions.SlashContext,
                      file: file_option,
@@ -402,6 +430,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, meta.randomEdits, args, {}
 
+    @util.store_command()
     @meta_group.subcommand(sub_cmd_name="repeat", sub_cmd_description="run the previous command on its output")
     async def repeat(self, ctx: interactions.SlashContext,
                      ) -> None:
@@ -413,6 +442,7 @@ class Edit(interactions.Extension):
         await edit_util.run_in_subprocess(ctx2, image_io.send_file, (img,), self.last_send_args)
         self.last_img = img
 
+    @util.store_command()
     @meta_group.subcommand(sub_cmd_name="repost", sub_cmd_description="send the output of the last edit")
     async def repost(self, ctx: interactions.SlashContext
                      ) -> None:

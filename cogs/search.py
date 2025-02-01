@@ -15,6 +15,7 @@ class Search(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
 
+    @util.store_command()
     @interactions.slash_command(**util.command_args, name="search", description="search for a substring and get stats")
     async def search(self, ctx: interactions.SlashContext,
                      query: typing.Annotated[str, interactions.slash_str_option("text to search for", True)],

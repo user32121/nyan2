@@ -19,6 +19,7 @@ class Status(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
 
+    @util.store_command()
     @interactions.slash_command(** util.command_args, name="status", description="set bot activity")
     async def status(self, ctx: interactions.SlashContext,
                      activity: typing.Annotated[str, interactions.slash_str_option(description="activity name", required=True)],
