@@ -17,6 +17,7 @@ class Help(interactions.Extension):
         await util.preprocess(ctx)
         msg = ""
         for name, keyword, description in util.all_commands:
+            # TODO make a util function for this
             line = f"{name} ({keyword}): {description}\n"
             if len(msg + line) > 2000:
                 await ctx.send(msg)

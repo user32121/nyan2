@@ -35,7 +35,7 @@ class ProgressHook:
 
 class Queue:
     def __init__(self) -> None:
-        self.queue: list[tuple[str, util.PsuedoContext, interactions.TYPE_VOICE_CHANNEL]] = []
+        self.queue: list[tuple[util.PsuedoContext, interactions.TYPE_VOICE_CHANNEL, str, str, str]] = []
         self.run_lock = asyncio.Lock()
 
     async def add(self, url: str, ctx: util.PsuedoContext, channel: interactions.TYPE_VOICE_CHANNEL) -> None:
@@ -44,14 +44,15 @@ class Queue:
         filename = "".join(random.choices(string.ascii_letters + string.digits, k=32))
         hook = ProgressHook(ctx, asyncio.get_running_loop())
         ytdl = youtube_dl.YoutubeDL({"outtmpl": f"audio/{filename}.%(ext)s", "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}], "progress_hooks": [hook.progress_hook]})
+        info = await asyncio.to_thread(ytdl.extract_info, url) or {}
         await asyncio.to_thread(ytdl.download, [url])
         filename = re.sub(r"(?:\.\w+)+", ".mp3", hook.filename)
-        self.queue.append((filename, ctx, channel))
+        self.queue.append((ctx, channel, filename, info["title"], url))
         await ctx.edit(content="queued")
 
     async def run(self) -> None:
         async with self.run_lock:
-            filename, ctx, channel = self.queue.pop(0)
+            _, channel, filename, _, _ = self.queue.pop(0)
 
             if not channel.voice_state:
                 await channel.connect()
@@ -95,3 +96,12 @@ class Audio(interactions.Extension):
             raise interactions.errors.BadArgument("not currently playing")
         await ctx.voice_state.stop()
         await ctx.edit(content="skipped")
+
+    @util.store_command("view")
+    @interactions.slash_command(** util.command_args, name="audio", description="voice channel audio commands", sub_cmd_name="queue", sub_cmd_description="view the current queue")
+    async def view_queue(self, ctx: interactions.SlashContext) -> None:
+        await util.preprocess(ctx)
+        msg = ""
+        for _, _, _, title, url in self.queue.queue:
+            msg += f"[{title}](<{url}>)\n"
+        await ctx.send(msg or "queue is empty")
