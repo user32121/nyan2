@@ -1,0 +1,9 @@
+colorama
+discord_py_interactions
+numpy
+pillow
+pydub
+python_dateutil
+requests
+scipy
+torch
