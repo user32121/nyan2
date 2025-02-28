@@ -29,7 +29,7 @@ class ProgressHook:
         self.last_update = time.time()
         db = info["downloaded_bytes"]
         tb = info.get("total_bytes", round(info.get("total_bytes_estimate", 1)))
-        ps = info.get("_percent_str", str(round(db/tb*100))+"%")
+        ps = info.get("_percent_str", str(round(db/tb*100))+"%").strip()
         asyncio.run_coroutine_threadsafe(self.ctx.edit(content=f"downloading {db}/{tb} ({ps})..."), self.loop)
 
 
@@ -43,15 +43,16 @@ class Queue:
         os.makedirs("audio", exist_ok=True)
         filename = "".join(random.choices(string.ascii_letters + string.digits, k=32))
         hook = ProgressHook(ctx, asyncio.get_running_loop())
-        ytdl = youtube_dl.YoutubeDL({"outtmpl": f"audio/{filename}.%(ext)s", "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}], "progress_hooks": [hook.progress_hook]})
+        ytdl = youtube_dl.YoutubeDL({"outtmpl": f"audio/{filename}.%(ext)s", "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}], "progress_hooks": [hook.progress_hook], "noplaylist": True})
         info = await asyncio.to_thread(ytdl.extract_info, url) or {}
-        await asyncio.to_thread(ytdl.download, [url])
         filename = re.sub(r"(?:\.\w+)+", ".mp3", hook.filename)
         self.queue.append((ctx, channel, filename, info["title"], url))
         await ctx.edit(content="queued")
 
     async def run(self) -> None:
         async with self.run_lock:
+            if not len(self.queue):
+                return
             _, channel, filename, _, _ = self.queue.pop(0)
 
             if not channel.voice_state:
@@ -97,7 +98,14 @@ class Audio(interactions.Extension):
         await ctx.voice_state.stop()
         await ctx.edit(content="skipped")
 
-    @util.store_command("view")
+    @util.store_command()
+    @interactions.slash_command(** util.command_args, name="audio", description="voice channel audio commands", sub_cmd_name="clear", sub_cmd_description="remove all items from the queue")
+    async def clear(self, ctx: interactions.SlashContext) -> None:
+        await util.preprocess(ctx)
+        self.queue.queue.clear()
+        await ctx.send("cleared")
+
+    @util.store_command()
     @interactions.slash_command(** util.command_args, name="audio", description="voice channel audio commands", sub_cmd_name="queue", sub_cmd_description="view the current queue")
     async def view_queue(self, ctx: interactions.SlashContext) -> None:
         await util.preprocess(ctx)
@@ -105,3 +113,13 @@ class Audio(interactions.Extension):
         for _, _, _, title, url in self.queue.queue:
             msg += f"[{title}](<{url}>)\n"
         await ctx.send(msg or "queue is empty")
+
+    @util.store_command()
+    @interactions.slash_command(** util.command_args, name="audio", description="voice channel audio commands", sub_cmd_name="flush", sub_cmd_description="in case some audio is in the queue and is not playing, try this")
+    async def flush(self, ctx: interactions.SlashContext) -> None:
+        await util.preprocess(ctx)
+        ctx2 = util.PsuedoContext(ctx)
+        await ctx2.send(content="flushing...")
+        while len(self.queue.queue):
+            await self.queue.run()
+        await ctx2.edit(content="flushed")
