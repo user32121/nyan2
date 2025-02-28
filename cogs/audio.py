@@ -1,7 +1,10 @@
 import logging
 import os
+import string
 import re
 import typing
+import random
+import asyncio
 
 import interactions
 import interactions.api.voice.audio
@@ -12,7 +15,18 @@ import util
 logger = logging.getLogger(__name__)
 
 
-class ProgressHook():
+class Queue:
+    def __init__(self) -> None:
+        self.queue = []
+
+    def add(self, file: str, msg: interactions.Message) -> None:
+        self.queue.append((file, msg))
+
+    def run(self) -> None:
+        pass
+
+
+class ProgressHook:
     def progress_hook(self, info):
         self.filename = info["filename"]
 
@@ -22,7 +36,7 @@ class Audio(interactions.Extension):
         logger.info("init")
         self.queue = []
 
-    @util.store_command()
+    @util.store_command("url")
     @interactions.slash_command(** util.command_args, name="audio", description="voice channel audio commands", sub_cmd_name="play", sub_cmd_description="play audio from a YT url")
     async def play(self, ctx: interactions.SlashContext,
                    url: typing.Annotated[str, interactions.slash_str_option("link to the video", required=True)],
@@ -40,7 +54,8 @@ class Audio(interactions.Extension):
         await ctx2.send(content="downloading...")
         hook = ProgressHook()
         os.makedirs("audio", exist_ok=True)
-        ytdl = youtube_dl.YoutubeDL({"outtmpl": "audio/%(id)s.%(ext)s", "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}], "progress_hooks": [hook.progress_hook]})
+        name = "".join(random.choices(string.ascii_letters + string.digits, k=32))
+        ytdl = youtube_dl.YoutubeDL({"outtmpl": f"audio/{name}.%(ext)s", "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}], "progress_hooks": [hook.progress_hook]})
         ytdl.download([url])
 
         filename = re.sub(r"(?:\.\w+)+", ".mp3", hook.filename)
@@ -57,7 +72,7 @@ class Audio(interactions.Extension):
     @interactions.slash_command(** util.command_args, name="audio", description="voice channel audio commands", sub_cmd_name="skip", sub_cmd_description="stop the current audio")
     async def skip(self, ctx: interactions.SlashContext) -> None:
         await util.preprocess(ctx)
-        if not isinstance(ctx.voice_state, interactions.ActiveVoiceState):
+        if not isinstance(ctx.voice_state, interactions.ActiveVoiceState) or ctx.voice_state.stopped:
             raise interactions.errors.BadArgument("not currently playing")
         await ctx.voice_state.stop()
         await ctx.edit(content="skipped")
