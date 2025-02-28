@@ -1,5 +1,6 @@
 colorama
 discord_py_interactions
+discord_py_interactions[voice]
 numpy
 pillow
 pydub
@@ -7,4 +8,5 @@ python_dateutil
 requests
 scipy
 torch
+youtube-dl
 youtube-dl-nightly
