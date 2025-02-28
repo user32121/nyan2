@@ -1,5 +1,4 @@
 import logging
-import typing
 
 import interactions
 
@@ -14,7 +13,7 @@ class Help(interactions.Extension):
 
     @util.store_command()
     @interactions.slash_command(** util.command_args, name="help", description="list info about commands")
-    async def no(self, ctx: interactions.SlashContext) -> None:
+    async def help(self, ctx: interactions.SlashContext) -> None:
         await util.preprocess(ctx)
         msg = ""
         for name, keyword, description in util.all_commands:
