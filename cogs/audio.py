@@ -21,6 +21,7 @@ class ProgressHook:
         self.last_update = time.time()
         self.ctx = ctx
         self.loop = loop
+        self.filename = ""
 
     def progress_hook(self, info: dict) -> None:
         self.filename = info["filename"]
@@ -43,11 +44,25 @@ class Queue:
         os.makedirs("audio", exist_ok=True)
         filename = "".join(random.choices(string.ascii_letters + string.digits, k=32))
         hook = ProgressHook(ctx, asyncio.get_running_loop())
-        ytdl = youtube_dl.YoutubeDL({"outtmpl": f"audio/{filename}.%(ext)s", "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}], "progress_hooks": [hook.progress_hook], "noplaylist": True})
+        ytdl = youtube_dl.YoutubeDL({"outtmpl": f"audio/{filename}.%(ext)s", "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}], "progress_hooks": [hook.progress_hook], "noplaylist": True, "extract_flat": "in_playlist"})
         info = await asyncio.to_thread(ytdl.extract_info, url) or {}
         filename = re.sub(r"(?:\.\w+)+", ".mp3", hook.filename)
+        assert filename, "not a video"
         self.queue.append((ctx, channel, filename, info["title"], url))
         await ctx.edit(content="queued")
+
+    async def add_list(self, url: str, ctx: util.PsuedoContext, channel: interactions.TYPE_VOICE_CHANNEL) -> int:
+        os.makedirs("audio", exist_ok=True)
+        ytdl = youtube_dl.YoutubeDL({"outtmpl": f"audio/temp.%(ext)s", "extract_flat": True})
+        info = await asyncio.to_thread(ytdl.extract_info, url) or {}
+        assert "_type" in info and info["_type"] == "playlist", "not a playlist"
+        msg = await ctx.send(content=f"found {len(info['entries'])} items")
+        await ctx.send(content="downloading...")
+        for i, video in enumerate(info["entries"]):
+            await msg.edit(content=f"downloading playlist {i}/{len(info['entries'])}...")
+            await self.add(video["url"], ctx, channel)
+        await msg.edit(content="queued playlist")
+        return len(info["entries"])
 
     async def run(self) -> None:
         async with self.run_lock:
@@ -88,6 +103,24 @@ class Audio(interactions.Extension):
 
         await self.queue.add(url, ctx2, channel)
         await self.queue.run()
+
+    @util.store_command("url")
+    @interactions.slash_command(** util.command_args, name="audio", description="voice channel audio commands", sub_cmd_name="playlist", sub_cmd_description="play audio from a YT playlist url")
+    async def playlist(self, ctx: interactions.SlashContext,
+                       url: typing.Annotated[str, interactions.slash_str_option("link to the playlist", required=True)],
+                       ) -> None:
+        await util.preprocess(ctx)
+        ctx2 = util.PsuedoContext(ctx)
+
+        if not isinstance(ctx.author, interactions.Member):
+            raise interactions.errors.BadArgument("command must be run in a guild channel")
+        if not isinstance(ctx.author.voice, interactions.VoiceState):
+            raise interactions.errors.BadArgument("please join a voice channel first")
+        channel = ctx.author.voice.channel
+
+        num = await self.queue.add_list(url, ctx2, channel)
+        for _ in range(num):
+            await self.queue.run()
 
     @util.store_command("stop")
     @interactions.slash_command(** util.command_args, name="audio", description="voice channel audio commands", sub_cmd_name="skip", sub_cmd_description="stop the current audio")
