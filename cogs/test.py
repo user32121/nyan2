@@ -1,10 +1,9 @@
-import asyncio
 import logging
+import typing
 
 import interactions
 
 import util
-
 
 logger = logging.getLogger(__name__)
 
@@ -15,11 +14,10 @@ class Test(interactions.Extension):
 
     @interactions.slash_command(** util.command_args, name="test", description="for testing things")
     async def test(self, ctx: interactions.SlashContext,
+                   s: typing.Annotated[str, interactions.slash_str_option("link to the video", required=True)],
                    ) -> None:
         await util.preprocess(ctx)
-        ctx2 = util.PsuedoContext(ctx)
-        await ctx2.send(content="message1 (next message in 10 seconds)")
-        await asyncio.sleep(10)
-        await ctx2.send(content="message2 (next message in 15 minutes 10 seconds)")
-        await asyncio.sleep(15 * 60 + 10)
-        await ctx2.send(content="message3")
+        o = "nya?"
+        if isinstance(o, typing.Awaitable):
+            o = await o
+        await ctx.send(content=str(o))

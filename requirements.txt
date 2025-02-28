@@ -7,3 +7,4 @@ python_dateutil
 requests
 scipy
 torch
+youtube-dl-nightly
