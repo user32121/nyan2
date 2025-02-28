@@ -29,8 +29,8 @@ class ProgressHook:
         self.last_update = time.time()
         db = info["downloaded_bytes"]
         tb = info.get("total_bytes", round(info.get("total_bytes_estimate", 1)))
-        ps = info.get("_percent_str", str(round(db/tb*100)))
-        asyncio.run_coroutine_threadsafe(self.ctx.edit(content=f"downloading ({db}/{tb} {ps}%)..."), self.loop)
+        ps = info.get("_percent_str", str(round(db/tb*100))+"%")
+        asyncio.run_coroutine_threadsafe(self.ctx.edit(content=f"downloading {db}/{tb} ({ps})..."), self.loop)
 
 
 class Queue:
@@ -60,9 +60,9 @@ class Queue:
             if not isinstance(channel.voice_state, interactions.ActiveVoiceState):
                 raise interactions.errors.BadArgument("lost access to voice channel")
             await channel.voice_state.play(audio)
-            # TODO remove file when done
             if not len(self.queue):
                 await channel.disconnect()
+            os.remove(filename)
 
 
 class Audio(interactions.Extension):
