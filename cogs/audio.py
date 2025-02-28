@@ -1,10 +1,11 @@
+import asyncio
 import logging
 import os
-import string
-import re
-import typing
 import random
-import asyncio
+import re
+import string
+import time
+import typing
 
 import interactions
 import interactions.api.voice.audio
@@ -16,9 +17,20 @@ logger = logging.getLogger(__name__)
 
 
 class ProgressHook:
-    def progress_hook(self, info):
-        # TODO status update
+    def __init__(self, ctx: util.PsuedoContext, loop: asyncio.AbstractEventLoop) -> None:
+        self.last_update = time.time()
+        self.ctx = ctx
+        self.loop = loop
+
+    def progress_hook(self, info: dict) -> None:
         self.filename = info["filename"]
+        if info["status"] == "downloading" and time.time() - self.last_update < 2:
+            return
+        self.last_update = time.time()
+        db = info["downloaded_bytes"]
+        tb = info.get("total_bytes", round(info.get("total_bytes_estimate", 1)))
+        ps = info.get("_percent_str", str(round(db/tb*100)))
+        asyncio.run_coroutine_threadsafe(self.ctx.edit(content=f"downloading ({db}/{tb} {ps}%)..."), self.loop)
 
 
 class Queue:
@@ -30,7 +42,7 @@ class Queue:
         await ctx.edit(content="downloading...")
         os.makedirs("audio", exist_ok=True)
         filename = "".join(random.choices(string.ascii_letters + string.digits, k=32))
-        hook = ProgressHook()
+        hook = ProgressHook(ctx, asyncio.get_running_loop())
         ytdl = youtube_dl.YoutubeDL({"outtmpl": f"audio/{filename}.%(ext)s", "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}], "progress_hooks": [hook.progress_hook]})
         await asyncio.to_thread(ytdl.download, [url])
         filename = re.sub(r"(?:\.\w+)+", ".mp3", hook.filename)
@@ -75,7 +87,7 @@ class Audio(interactions.Extension):
         await self.queue.add(url, ctx2, channel)
         await self.queue.run()
 
-    @util.store_command()
+    @util.store_command("stop")
     @interactions.slash_command(** util.command_args, name="audio", description="voice channel audio commands", sub_cmd_name="skip", sub_cmd_description="stop the current audio")
     async def skip(self, ctx: interactions.SlashContext) -> None:
         await util.preprocess(ctx)
