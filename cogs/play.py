@@ -45,6 +45,5 @@ class Play(interactions.Extension):
         if not isinstance(ctx.voice_state, interactions.ActiveVoiceState):
             raise interactions.errors.BadArgument("lost access to voice channel")
         filename = re.sub(r"(?:\.\w+)+", ".mp3", hook.filename)
-        logger.info(filename)
         audio = interactions.api.voice.audio.AudioVolume(filename)
         await ctx.voice_state.play(audio)
