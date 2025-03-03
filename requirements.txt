@@ -10,3 +10,6 @@ scipy
 torch
 youtube-dl
 youtube-dl-nightly
+packaging
+torchvision
+tqdm
