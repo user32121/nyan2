@@ -90,7 +90,8 @@ class PsuedoContext:
         return self.ctx
 
     async def edit(self, **kwargs) -> interactions.Message:
-        return await self.ctx.edit(**kwargs)
+        self.ctx = await self.ctx.edit(**kwargs)
+        return self.ctx
 
 
 all_commands: list[tuple[str, str, str]] = []
