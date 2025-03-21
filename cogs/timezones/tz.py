@@ -233,5 +233,3 @@ timezone_info = {
     "YEKT": int(5 * 3600),
     "Z": int(0 * 3600),
 }
-for k in list(timezone_info.keys()):
-    timezone_info[k.lower()] = timezone_info[k]

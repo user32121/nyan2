@@ -24,7 +24,8 @@ class Timezone(interactions.Extension):
                        ) -> None:
         await util.preprocess(ctx)
         msg = ""
-        if (time == "now"):
+        time = time.upper()
+        if (time == "NOW"):
             dt = datetime.datetime.now()
         else:
             try:
