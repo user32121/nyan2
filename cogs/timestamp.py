@@ -13,13 +13,13 @@ from .timezones import tz
 logger = logging.getLogger(__name__)
 
 
-class Timezone(interactions.Extension):
+class Timestamp(interactions.Extension):
     def __init__(self, bot) -> None:
         logger.info("init")
 
     @util.store_command()
-    @interactions.slash_command(** util.command_args, name="timezone", description="get a global timestamp for a datetime")
-    async def timezone(self, ctx: interactions.SlashContext,
+    @interactions.slash_command(** util.command_args, name="timestamp", description="display a date and time using a Discord timestamp")
+    async def timestamp(self, ctx: interactions.SlashContext,
                        time: typing.Annotated[str, interactions.slash_str_option(description="preferred format: mm/dd/yyyy hh:mm:ss am/pm timezone", required=True)],
                        ) -> None:
         await util.preprocess(ctx)
