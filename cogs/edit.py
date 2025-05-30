@@ -345,6 +345,18 @@ class Edit(interactions.Extension):
         self.last_img, self.last_edit, self.last_args, self.last_send_args = img, animated.reverse, args, {}
 
     @util.store_command()
+    @animated_group.subcommand(sub_cmd_name="airstrike", sub_cmd_description="an explosion from high")
+    async def airstrike(self, ctx: interactions.SlashContext,
+                        file: file_option,
+                        ) -> None:
+        await util.preprocess(ctx)
+        img = image_io.from_url(file.proxy_url)
+        args = ()
+        img = await edit_util.run_in_subprocess(ctx, animated.airstrike, (img, *args))
+        await edit_util.run_in_subprocess(ctx, image_io.send_file, (img,))
+        self.last_img, self.last_edit, self.last_args, self.last_send_args = img, animated.airstrike, args, {}
+
+    @util.store_command()
     @misc_group.subcommand(sub_cmd_name="snap", sub_cmd_description="swap pixels around")
     async def snap(self, ctx: interactions.SlashContext,
                    file: file_option,

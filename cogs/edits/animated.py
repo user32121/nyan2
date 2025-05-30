@@ -143,3 +143,17 @@ def ash(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame], del
 
 def reverse(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
     return imgs[::-1]
+
+
+def airstrike(ctx: util.MultiprocessingPsuedoContext, imgs: list[util.ImageFrame]) -> list[util.ImageFrame]:
+    strike_imgs = np.load(os.path.join("cogs", "images", "airstrike.npy"))
+    strike_imgs = [PIL.Image.fromarray(img, "RGBA") for img in strike_imgs]
+    for i in range(len(strike_imgs)):
+        strike_imgs[i] = strike_imgs[i].resize(imgs[0].frame.size)
+    new_imgs = []
+    m = max(len(strike_imgs), len(imgs))
+    for i in range(m):
+        i1 = i * len(imgs) // m
+        i2 = i * len(strike_imgs) // m
+        new_imgs.append(util.ImageFrame(frame=PIL.Image.alpha_composite(imgs[i1].frame, strike_imgs[i2]), duration=imgs[i1].duration or 6))
+    return new_imgs
