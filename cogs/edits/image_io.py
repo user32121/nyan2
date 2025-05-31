@@ -32,7 +32,7 @@ def to_file(imgs: list[util.ImageFrame]) -> tuple[io.BytesIO, str]:
     else:
         ext = "gif"
         for i in range(len(imgs)):
-            imgs[i] = util.ImageFrame(imgs[i].frame.convert("P"), imgs[i].duration)
+            imgs[i] = util.ImageFrame(imgs[i].frame.convert("RGB").convert("P"), imgs[i].duration)
     frames = [x.frame for x in imgs]
     durations = [x.duration for x in imgs]
     imgs[0].frame.save(f, ext, save_all=True, append_images=frames[1:], loop=0, duration=durations)
