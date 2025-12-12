@@ -20,7 +20,8 @@ class Earrape(interactions.Extension):
     @interactions.slash_command(** util.command_args, name="earrape", description="make stuff very loud")
     async def earrape(self, ctx: interactions.SlashContext,
                       file: typing.Annotated[interactions.Attachment, interactions.slash_attachment_option("the file to modify", True)],
-                      gain: typing.Annotated[int, interactions.slash_int_option("the amount to increase by, default: 10")] = 10,
+                      gain: typing.Annotated[int, interactions.slash_int_option(
+                          "the amount to increase by, default: 10")] = 10,
                       ) -> None:
         await util.preprocess(ctx)
         res = requests.get(file.proxy_url)
@@ -32,5 +33,5 @@ class Earrape(interactions.Extension):
                 logger.info(e)
                 return
             audio = audio.apply_gain(gain)
-        with typing.cast(tempfile._TemporaryFileWrapper, audio.export()) as f:
-            await ctx.send(file=interactions.File(typing.cast(io.IOBase, f.file), file_name="file.mp3"))
+        with typing.cast(io.BufferedRandom, audio.export()) as f:
+            await ctx.send(file=interactions.File(f, file_name="file.mp3"))
