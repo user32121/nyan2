@@ -106,6 +106,7 @@ async def run_in_subprocess(ctx: interactions.SlashContext | PsuedoContext, f: t
     if (type(res) == tuple):
         e, tb = res
         print("\n".join(tb))
+        print('-' * 100)
         raise e
     elif (type(res) == MultiprocessingResult):
         return res.res
