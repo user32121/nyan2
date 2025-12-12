@@ -19,9 +19,9 @@ ColourType = tuple[int, int, int, int]
 
 
 class ColourConverter(interactions.Converter):
-    async def convert(self, ctx: interactions.SlashContext, arg: str) -> ColourType:
+    async def convert(self, ctx: interactions.BaseContext, argument: str) -> ColourType:
         try:
-            res = PIL.ImageColor.getrgb(arg)
+            res = PIL.ImageColor.getrgb(argument)
         except ValueError as e:
             raise interactions.errors.BadArgument(str(e))
         if (len(res) == 3):
@@ -31,10 +31,10 @@ class ColourConverter(interactions.Converter):
 
 def makeCoordConverter(invert=False):
     class CoordConverter(interactions.Converter):
-        async def convert(self, ctx: interactions.SlashContext, arg: float) -> float:
+        async def convert(self, ctx: interactions.BaseContext, argument: float) -> float:
             if (invert):
-                arg = 1 - arg
-            return arg
+                argument = 1 - argument
+            return argument
     return CoordConverter
 
 
@@ -50,7 +50,7 @@ ImageEditType = typing.Callable[..., list[ImageFrame]]
 def normalize_coordinates(coords: np.ndarray, shape: tuple[int, int], center: tuple[float, float], square=True) -> np.ndarray:
     """
     convert integer coordinates ([0,shape]) to normalized coordinates (typically [-1,1] but with a shifted center)
-    
+
     args:
         coords: the coordinates the normalize
         shape: the maximum range of coords
@@ -87,7 +87,8 @@ class MultiprocessingPsuedoContext:
 
 
 async def run_in_subprocess(ctx: interactions.SlashContext | PsuedoContext, f: typing.Callable[..., T], args: tuple, kwargs: dict[str, typing.Any] = {}) -> T:
-    q: multiprocessing.Queue[MultiprocessingResult[T] | tuple[Exception, list[str]] | dict] = multiprocessing.Queue()
+    q: multiprocessing.Queue[MultiprocessingResult[T] |
+                             tuple[Exception, list[str]] | dict] = multiprocessing.Queue()
 
     p = multiprocessing.Process(target=run_process, args=(f, args, kwargs, q))
     p.start()
@@ -95,7 +96,8 @@ async def run_in_subprocess(ctx: interactions.SlashContext | PsuedoContext, f: t
         while p.is_alive() and q.empty():
             await asyncio.sleep(1)
         if (q.empty()):
-            raise RuntimeError(f"subprocess exited with code {p.exitcode} and returned no output")
+            raise RuntimeError(
+                f"subprocess exited with code {p.exitcode} and returned no output")
         res = q.get()
         if (type(res) == dict):
             await ctx.send(**res)
@@ -111,8 +113,10 @@ async def run_in_subprocess(ctx: interactions.SlashContext | PsuedoContext, f: t
 
 
 def run_process(f:  typing.Callable[..., T], args: tuple, kwargs: dict[str, typing.Any], q: multiprocessing.Queue):
-    q2: multiprocessing.Queue[MultiprocessingResult[T] | tuple[Exception, list[str]] | dict] = q
+    q2: multiprocessing.Queue[MultiprocessingResult[T]
+                              | tuple[Exception, list[str]] | dict] = q
     try:
-        q2.put(MultiprocessingResult(f(MultiprocessingPsuedoContext(q2), *args, **kwargs)))
+        q2.put(MultiprocessingResult(
+            f(MultiprocessingPsuedoContext(q2), *args, **kwargs)))
     except Exception as e:
         q2.put((e, traceback.format_exception(e)))
