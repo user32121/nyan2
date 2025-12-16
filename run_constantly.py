@@ -9,8 +9,9 @@ with open('autorestart.txt', 'w') as f:
 while os.path.isfile('autorestart.txt'):
     print('updating...')
     os.system('git pull')
-    assert os.system(
+    res = os.system(
         f'{PYTHON} -m pip install --upgrade pip -r requirements.txt')
+    assert not res, res
     print('starting...')
     os.system(f'{PYTHON} main.py')
     print('stopped')
