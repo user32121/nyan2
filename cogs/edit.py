@@ -19,7 +19,7 @@ meta_group = base_command.group("meta", "edits that use other edits")
 
 
 def slash_colour_option(required):
-    return interactions.slash_str_option("the colour to apply (see PIL's getrgb() for technical details)", required=required)
+    return interactions.slash_str_option("the colour to apply (use hex codes dangit (#RRGGBB))", required=required)
 
 
 file_option = typing.Annotated[interactions.Attachment, interactions.slash_attachment_option("the image to edit", True)]
